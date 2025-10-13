@@ -1,57 +1,110 @@
-{% block content %}
-<div class="main-container">
-        <nav class="nav-desktop">
-            <a href="/socios/">Socios</a>
-            <a href="/pagos/">Pagos</a>
-            <a href="/rutina/asignar/">Rutinas</a>
-            <a href="/ocupacion/actual/">Ocupación</a>
-            {% if user.is_authenticated %}
-                <form method="post" action="{% url 'logout' %}">
-                    {% csrf_token %}
-                    <button type="submit">Salir</button>
-                </form>
-            {% endif %}
-        </nav>
+{% extends "base_dash.html" %}
+{% load static %}
 
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <h2>Panel de Administrador</h2>
-                <div class="hamburger-menu close-sidebar" id="sidebar-close-btn">
-                    <div class="bar"></div>
-                    <div class="bar"></div>
-                    <div class="bar"></div>
+{% block extra_css %}
+  {{ block.super }}
+  <!-- Bootstrap SOLO en esta vista -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="{% static 'css/migym-theme.css' %}">
+{% endblock %}
+
+{% block page_content %}
+<div class="container-fluid py-3">
+
+  <!-- Encabezado -->
+  <section class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <h1 class="h3 mb-1">Pagos / Nuevo</h1>
+      <p class="text-body-secondary m-0">Registrá un pago para una suscripción activa.</p>
+    </div>
+    <div class="d-flex gap-2">
+      <a href="{% url 'pagos:pagos_lista' %}" class="btn btn-outline-secondary">Cancelar</a>
+    </div>
+  </section>
+
+  <!-- Card del formulario -->
+  <div class="card shadow-sm">
+    <div class="card-header">
+      <h2 class="h5 mb-0">Datos del pago</h2>
+    </div>
+
+    <div class="card-body">
+      {% if form.non_field_errors %}
+        <div class="alert alert-danger">
+          {{ form.non_field_errors }}
+        </div>
+      {% endif %}
+
+      <form method="post" novalidate>
+        {% csrf_token %}
+
+        <div class="row g-3">
+          {# Render genérico: cada campo en su form-group #}
+          {% for field in form %}
+            <div class="col-12 col-md-6">
+              <label class="form-label" for="{{ field.id_for_label }}">
+                {{ field.label }}
+                {% if field.field.required %}<span class="text-danger">*</span>{% endif %}
+              </label>
+
+              {# Render sin depender de crispy ni filtros: Bootstrap por JS abajo #}
+              {{ field }}
+
+              {% if field.help_text %}
+                <div class="form-text">{{ field.help_text }}</div>
+              {% endif %}
+
+              {% if field.errors %}
+                <div class="invalid-feedback d-block">
+                  {{ field.errors|striptags }}
                 </div>
+              {% endif %}
             </div>
-            <nav class="sidebar-nav">
-                <a href="/socios/">Socios</a>
-                <a href="/pagos/">Pagos</a>
-                <a href="/rutina/asignar/">Rutinas</a>
-                <a href="/ocupacion/actual/">Ocupación</a>
-                {% if user.is_authenticated %}
-                    <form method="post" action="{% url 'logout' %}">
-                        {% csrf_token %}
-                        <button type="submit">
-                            <span class="icon">🚪</span> Salir
-                        </button>
-                    </form>
-                {% endif %}
-            </nav>
-        </aside>
+          {% endfor %}
+        </div>
 
-        <div class="content-container">
-            <header>
-                <div class="hamburger-menu" id="main-hamburger">
-                    <div class="bar"></div>
-                    <div class="bar"></div>
-                    <div class="bar"></div>
-                </div>
-            </header>
-<h2>Nuevo Pago</h2>
+        <div class="d-flex gap-2 justify-content-end mt-4">
+          <a href="{% url 'pagos:pagos_lista' %}" class="btn btn-outline-secondary">Cancelar</a>
+          <button type="submit" class="btn btn-primary">Guardar</button>
+        </div>
+      </form>
+    </div>
 
-<form method="post">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit">Guardar</button>
-  <a href="{% url 'pagos:pagos_lista' %}">Cancelar</a>
-</form>
+    <div class="card-footer small text-body-secondary">
+      Los campos marcados con <span class="text-danger">*</span> son obligatorios.
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+  {{ block.super }}
+  <!-- Bootstrap SOLO en esta vista -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // Añade clases Bootstrap sin tocar el formulario en Python:
+    document.addEventListener('DOMContentLoaded', function () {
+      const form = document.querySelector('.card form');
+      if (!form) return;
+
+      form.querySelectorAll('input:not([type=checkbox]):not([type=radio]):not([type=file])')
+          .forEach(el => el.classList.add('form-control'));
+
+      form.querySelectorAll('input[type=date], input[type=datetime-local], input[type=time], input[type=number], input[type=email], input[type=text], input[type=password]')
+          .forEach(el => el.classList.add('form-control'));
+
+      form.querySelectorAll('textarea').forEach(el => el.classList.add('form-control'));
+      form.querySelectorAll('select').forEach(el => el.classList.add('form-select'));
+
+      // Marcar inválidos si el backend devuelve errores (ya mostramos d-block arriba)
+      form.querySelectorAll('.invalid-feedback').forEach(feedback => {
+        const control = feedback.previousElementSibling;
+        if (control && (control.tagName === 'INPUT' || control.tagName === 'SELECT' || control.tagName === 'TEXTAREA')) {
+          control.classList.add('is-invalid');
+        }
+      });
+    });
+  </script>
 {% endblock %}

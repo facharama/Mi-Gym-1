@@ -37,6 +37,8 @@ def crear_socio(request):
             socio = form.save()
             messages.success(request, "El socio se creó correctamente.")
             return redirect(f"{reverse('socios:detalle', args=[socio.pk])}?created=1")
+        else:
+            messages.error(request, "El socio ya se encuentra registrado.")
     else:
         form = SocioForm()
     return render(request, "socios/socio_form.html", {"form": form})
@@ -53,6 +55,8 @@ def editar_socio(request, pk):
             form.save()
             messages.success(request, "✅ Datos del socio actualizados correctamente.")
             return redirect("socios:detalle", pk=socio.pk)
+        else:
+            messages.error(request, "El socio ya se encuentra registrado.")
     else:
         form = SocioEditForm(instance=socio)
 
@@ -71,6 +75,3 @@ def crear_suscripcion(request, socio_id=None):
         form = SuscripcionForm(initial=initial)
     planes = Plan.objects.filter(activo=True).order_by("nombre")
     return render(request, "socios/form_suscripcion.html", {"form": form, "planes": planes})
-
-
-

@@ -27,22 +27,21 @@
     </div>
 
     <div class="card-body">
-      {% if form.non_field_errors %}
-        <div class="alert alert-danger">{{ form.non_field_errors }}</div>
-      {% endif %}
+     
+
 
       <form id="form-new-socio" method="post" action="" class="row g-3 needs-validation" novalidate>
         {% csrf_token %}
 
         <div class="col-md-6">
           <label for="id_first_name" class="form-label">Nombre</label>
-          {{ form.first_name|default:form.nombre }}
+          {{ form.first_name}}
           <div class="invalid-feedback">Ingresá el nombre.</div>
         </div>
 
         <div class="col-md-6">
           <label for="id_last_name" class="form-label">Apellido</label>
-          {{ form.last_name|default:form.apellido }}
+          {{ form.last_name}}
           <div class="invalid-feedback">Ingresá el apellido.</div>
         </div>
 
@@ -59,18 +58,19 @@
         </div>
 
         {% if form.sucursal %}
-        <div class="col-md-6">
-          <label for="id_sucursal" class="form-label">Sucursal</label>
-          {{ form.sucursal }}
-        </div>
+          <div class="col-md-6">
+            <label for="id_sucursal" class="form-label">Sucursal</label>
+            {{ form.sucursal }}
+          </div>
         {% endif %}
 
-        {% if form.estado %}
-        <div class="col-md-6">
-          <label for="id_estado" class="form-label">Estado</label>
-          {{ form.estado }}
+        {# Estado -> checkbox Activo #}
+        <div class="col-md-6 d-flex align-items-center">
+          <div class="form-check form-switch">
+            {{ form.activo }}
+            <label class="form-check-label ms-2" for="{{ form.activo.id_for_label }}">Activo</label>
+          </div>
         </div>
-        {% endif %}
 
         <div class="col-12 d-flex justify-content-end gap-2 mt-2">
           <a href="{% url 'socios:lista' %}" class="btn btn-outline-primary">Cancelar</a>

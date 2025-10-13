@@ -15,15 +15,18 @@
   {# Sidebar permanente a la izquierda #}
   {% include "partials/sidebar_admin.html" %}
 
+
   {# Sumamos utilidades Bootstrap sin tocar tu layout #}
   <div class="dash-container container-fluid py-4">
     {% block page_content %}{% endblock %}
   </div>
+  {% include "partials/_messages_modal.html" %}
+
 {% endblock %}
 
 {% block extra_js %}
 
-  {# Activamos el tema 'migym' (si tu base.html no lo setea) #}
+  {# === Estilos y scripts existentes === #}
   <script>document.documentElement.setAttribute('data-bs-theme','migym');</script>
 
   <script>
@@ -32,19 +35,10 @@
     const body = document.body;
     const toggle = document.getElementById("sidebar-toggle");
     const groupToggles = document.querySelectorAll(".ls-group-toggle");
-
-    // Arranca colapsado
     body.classList.add("sidebar-collapsed");
 
-    if (toggle) {
-      toggle.addEventListener("click", () => {
-        body.classList.toggle("sidebar-collapsed");
-      });
-    }
-
-    groupToggles.forEach(btn => {
-      btn.addEventListener("click", () => btn.parentElement.classList.toggle("open"));
-    });
+    if (toggle) toggle.addEventListener("click", () => body.classList.toggle("sidebar-collapsed"));
+    groupToggles.forEach(btn => btn.addEventListener("click", () => btn.parentElement.classList.toggle("open")));
   });
   </script>
 
@@ -80,9 +74,7 @@
         elName.textContent = nombreSeleccionado();
 
         if (window.miGymRefreshOcc) window.miGymRefreshOcc();
-      }catch(e){
-        console.error(e);
-      }
+      }catch(e){ console.error(e); }
     }
 
     sel.addEventListener('change', refresh);
@@ -90,4 +82,80 @@
     setInterval(refresh, 5000);
   })();
   </script>
+
+  {# === NUEVO: Bootstrap Datepicker con tema oscuro MiGym === #}
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vanillajs-datepicker@1.3.4/dist/css/datepicker-bs5.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/vanillajs-datepicker@1.3.4/dist/js/datepicker-full.min.js"></script>
+
+  <style>
+    .datepicker {
+      --bs-body-bg:#141414;
+      --bs-body-color:#fff;
+      --bs-border-color:#ff7a00;
+      --bs-tertiary-bg:#1b1b1b;
+      font-family: 'Inter', sans-serif;
+    }
+    .datepicker .datepicker-cell.selected,
+    .datepicker .datepicker-cell.focused {
+      background-color:#ff7a00;
+      color:#fff;
+    }
+    .datepicker .datepicker-cell:hover {
+      background:#2a2a2a;
+    }
+    .datepicker-dropdown {
+      box-shadow:0 10px 30px rgba(0,0,0,.5);
+      border:1px solid #ff7a00;
+      border-radius:8px;
+    }
+  </style>
+
+  {{ block.super }}
+
+  <script>
+  // Loader robusto con fallback + init del datepicker
+  (function(){
+    function addCSS(href){
+      var l=document.createElement('link'); l.rel='stylesheet'; l.href=href;
+      document.head.appendChild(l);
+    }
+    function addJS(src, onload){
+      var s=document.createElement('script'); s.src=src; s.defer=true;
+      s.onload=onload; s.onerror=function(){ onload && onload(new Error('load '+src)); };
+      document.head.appendChild(s);
+    }
+
+    // Carga CSS primero (tema Bootstrap 5)
+    addCSS('https://cdn.jsdelivr.net/npm/vanillajs-datepicker@1.3.4/dist/css/datepicker-bs5.min.css');
+
+    function initPickers(){
+      if (!window.Datepicker) { return false; }
+      var opts = { autohide:true, format:'dd/mm/yyyy', language:'es', container:document.body };
+      document.querySelectorAll('input.datepicker').forEach(function(el){
+        try{ if (el.type === 'date') el.type='text'; }catch(e){}
+        var inst = window.Datepicker.getInstance(el);
+        if (inst) { inst.setOptions(opts); }
+        else { new window.Datepicker(el, opts); }
+      });
+      return true;
+    }
+
+    function ready(fn){
+      if (document.readyState !== 'loading') fn(); else document.addEventListener('DOMContentLoaded', fn);
+    }
+
+    // 1er intento: jsdelivr
+    addJS('https://cdn.jsdelivr.net/npm/vanillajs-datepicker@1.3.4/dist/js/datepicker-full.min.js', function(){
+      ready(function(){
+        if (initPickers()) return;
+        // Fallback a unpkg si falló la 1ra URL
+        addJS('https://unpkg.com/vanillajs-datepicker@1.3.4/dist/js/datepicker-full.min.js', function(){
+          ready(function(){ initPickers(); });
+        });
+      });
+    });
+  })();
+  </script>
 {% endblock %}
+
+

@@ -145,4 +145,13 @@
       });
     })();
   </script>
+  <script>
+  (function() {
+    const opts = { autohide:true, format:'dd/mm/yyyy', language:'es', container: document.body };
+    document.querySelectorAll('input.datepicker').forEach(el => {
+      try { if (el.type === 'date') el.type = 'text'; } catch(e){}
+      new Datepicker(el, opts);
+    });
+  })();
+</script>
 {% endblock %}
