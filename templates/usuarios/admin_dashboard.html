@@ -3,77 +3,473 @@
 {% block title %}Dashboard · MiGym{% endblock %}
 
 {% block page_content %}
-{# === MINI PANEL: Ocupación por sucursal (arriba-derecha) === #}
-<div class="occ-mini-wrap">
-  <div class="occ-mini">
-    <div class="occ-mini__head">
-      <h3>Ocupación actual</h3>
-      <a href="{% url 'ocupacion:simulador' %}" class="occ-mini__link">→ Ir al simulador</a>
+{# === PANEL: Ocupación Global y por Sucursales === #}
+<div class="ocupacion-dashboard-wrap">
+  <div class="ocupacion-card">
+    <div class="ocupacion-header">
+      <h3><i class="bi bi-building"></i> Ocupación en Tiempo Real</h3>
+      <a href="{% url 'ocupacion:simulador' %}" class="ocupacion-link">
+        <i class="bi bi-arrow-right-circle"></i> Ir al simulador
+      </a>
     </div>
 
-    <div class="occ-mini__row">
-      <label for="occ-sel">Sucursal</label>
-      <select id="occ-sel">
-        {% for s in sucursales %}
-          <option value="{{ s.id }}" {% if s.id == default_sucursal_id %}selected{% endif %}>{{ s.nombre }}</option>
-        {% empty %}
-          <option value="">(sin sucursales)</option>
+    {# Total Global #}
+    <div class="ocupacion-global">
+      <div class="global-badge">GLOBAL</div>
+      <div class="global-numbers">
+        <div class="global-count">{{ ocupacion_global }}</div>
+        <div class="global-separator">/</div>
+        <div class="global-capacity">{{ capacidad_global }}</div>
+      </div>
+      <div class="global-label">Personas en todas las sucursales</div>
+      <div class="global-meter">
+        <div class="global-bar" style="width: {% if capacidad_global %}{{ ocupacion_global|floatformat:0|add:'0' }}{% widthratio ocupacion_global capacidad_global 100 %}%{% else %}0%{% endif %}"></div>
+      </div>
+    </div>
+
+    {# Selector de Sucursales #}
+    <div class="sucursal-selector">
+      <label for="sucursal-select">
+        <i class="bi bi-geo-alt"></i> Seleccionar sucursal
+      </label>
+      <select id="sucursal-select" class="sucursal-combo">
+        {% for suc in sucursales %}
+        <option value="{{ suc.id }}" 
+                data-ocupacion="{{ suc.ocupacion }}"
+                data-capacidad="{{ suc.capacidad }}"
+                data-porcentaje="{{ suc.porcentaje }}"
+                data-nivel="{{ suc.nivel }}"
+                data-color="{{ suc.color }}"
+                {% if forloop.first %}selected{% endif %}>
+          {{ suc.nombre }}
+        </option>
         {% endfor %}
       </select>
     </div>
 
-    <div class="occ-mini__kpis">
-      <div class="kpi">
-        <span class="kpi__label">Personas dentro</span>
-        <span id="occ-count" class="kpi__value">—</span>
+    {# Detalle de Sucursal Seleccionada #}
+    <div class="sucursal-detalle" id="sucursal-detalle">
+      {% if sucursales %}
+      {% with suc=sucursales.0 %}
+      <div class="sucursal-badge" style="background: {{ suc.color }}20; border-color: {{ suc.color }}; color: {{ suc.color }};">
+        <i class="bi bi-circle-fill"></i> OCUPACIÓN {{ suc.nivel|upper }}
       </div>
-      <div class="kpi">
-        <span class="kpi__label">Capacidad</span>
-        <span id="occ-capacity" class="kpi__value">—</span>
+      <div class="sucursal-name">
+        <i class="bi bi-geo-alt-fill"></i> <span id="suc-nombre">{{ suc.nombre }}</span>
       </div>
-      <div class="kpi kpi--text">
-        <span class="kpi__label">Sucursal</span>
-        <span id="occ-sucursal-name" class="kpi__value kpi__value--small">—</span>
+      <div class="sucursal-numbers">
+        <span class="suc-count" id="suc-ocupacion" style="color: {{ suc.color }};">{{ suc.ocupacion }}</span>
+        <span class="suc-sep">/</span>
+        <span class="suc-capacity" id="suc-capacidad">{{ suc.capacidad }}</span>
       </div>
+      <div class="sucursal-percentage" id="suc-porcentaje" style="color: {{ suc.color }};">
+        {{ suc.porcentaje }}%
+      </div>
+      <div class="sucursal-meter">
+        <div class="sucursal-bar" id="suc-bar" style="width: {{ suc.porcentaje }}%; background: {{ suc.color }};"></div>
+      </div>
+      {% endwith %}
+      {% else %}
+      <div class="empty-state">
+        <i class="bi bi-inbox"></i>
+        <p>No hay sucursales registradas</p>
+      </div>
+      {% endif %}
     </div>
 
-    <div class="occ-mini__meter"><div id="occ-bar" class="occ-mini__bar"></div></div>
-    <div class="occ-mini__hint">En vivo · 5s</div>
+    <script>
+    // Función para determinar color según porcentaje
+    function getColorFromPercentage(pct) {
+      if (pct <= 33) return '#10b981'; // Verde
+      if (pct <= 66) return '#f59e0b'; // Amarillo
+      return '#ef4444'; // Rojo
+    }
+    
+    // Función para determinar nivel según porcentaje
+    function getNivelFromPercentage(pct) {
+      if (pct <= 33) return 'baja';
+      if (pct <= 66) return 'media';
+      return 'alta';
+    }
+    
+    // Actualizar información cuando se cambia la sucursal
+    document.addEventListener('DOMContentLoaded', function() {
+      const selectElement = document.getElementById('sucursal-select');
+      
+      if (selectElement) {
+        selectElement.addEventListener('change', function(e) {
+          const sucursalId = e.target.value;
+          
+          // Consultar datos actuales del servidor via API
+          fetch(`/ocupacion/api/occupancy/current/?sucursal_id=${sucursalId}`)
+            .then(response => response.json())
+            .then(data => {
+              const ocupacion = data.count || 0;
+              const capacidad = data.capacity || 0;
+              const porcentaje = capacidad > 0 ? ((ocupacion / capacidad) * 100).toFixed(1) : 0;
+              const color = getColorFromPercentage(porcentaje);
+              const nivel = getNivelFromPercentage(porcentaje);
+              const nombre = e.target.selectedOptions[0].text;
+              
+              console.log('Datos actualizados:', {ocupacion, capacidad, porcentaje, nivel, color, nombre});
+              
+              // Actualizar valores en el DOM
+              document.getElementById('suc-nombre').textContent = nombre;
+              document.getElementById('suc-ocupacion').textContent = ocupacion;
+              document.getElementById('suc-ocupacion').style.color = color;
+              document.getElementById('suc-capacidad').textContent = capacidad;
+              document.getElementById('suc-porcentaje').textContent = porcentaje + '%';
+              document.getElementById('suc-porcentaje').style.color = color;
+              document.getElementById('suc-bar').style.width = porcentaje + '%';
+              document.getElementById('suc-bar').style.background = color;
+              
+              // Actualizar badge
+              const badge = document.querySelector('.sucursal-badge');
+              badge.style.background = color + '20';
+              badge.style.borderColor = color;
+              badge.style.color = color;
+              badge.innerHTML = '<i class="bi bi-circle-fill"></i> OCUPACIÓN ' + nivel.toUpperCase();
+            })
+            .catch(error => {
+              console.error('Error al obtener datos de ocupación:', error);
+            });
+        });
+        
+        // Actualizar automáticamente cada 5 segundos la sucursal actual
+        setInterval(function() {
+          if (selectElement.value) {
+            selectElement.dispatchEvent(new Event('change'));
+          }
+        }, 5000);
+      }
+    });
+    </script>
+
+    <div class="ocupacion-footer">
+      <i class="bi bi-arrow-clockwise"></i> Actualización en vivo · 5s
+    </div>
   </div>
 </div>
 
 <style>
-/* --- Mini panel arriba-derecha, sticky bajo el navbar --- */
-.occ-mini-wrap{
-  position: relative; top: 72px; z-index: 15;
-  display: flex; justify-content: flex-end;
-  margin: 0 16px 12px;
+/* Contenedor principal */
+.ocupacion-dashboard-wrap {
+  position: relative;
+  top: 72px;
+  margin: 0 16px 24px;
+  display: flex;
+  justify-content: flex-end;
+  z-index: 15;
 }
-.occ-mini{
-  width: 360px; max-width: 100%;
-  background: #0b0b0b;
-  border: 1px solid rgba(255,255,255,.08);
-  border-radius: 14px;
-  box-shadow: 0 16px 40px rgba(0,0,0,.55);
+
+.ocupacion-card {
+  width: 420px;
+  max-width: 100%;
+  background: linear-gradient(135deg, rgba(11, 11, 11, 0.98) 0%, rgba(15, 15, 15, 0.95) 100%);
+  border: 2px solid rgba(6, 182, 212, 0.2);
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
   color: #fff;
-  padding: .9rem;
+  padding: 1.25rem;
+  animation: slideInRight 0.4s ease-out;
 }
-.occ-mini__head{display:flex;align-items:center;justify-content:space-between;margin-bottom:.4rem}
-.occ-mini__head h3{margin:0;font-size:1.05rem}
-.occ-mini__link{font-size:.8rem;color:var(--cyan);text-decoration:none}
-.occ-mini__row{display:grid;grid-template-columns:1fr;gap:.3rem;margin:.45rem 0 .6rem}
-.occ-mini__row label{font-size:.8rem;color:var(--muted)}
-#occ-sel{background:#0c0c0c;color:#e5e7eb;border:1px solid rgba(255,255,255,.1);padding:.55rem .6rem;border-radius:10px;outline:none}
-.occ-mini__kpis{display:flex;gap:.55rem;align-items:stretch;margin-bottom:.55rem}
-.kpi{flex:1 1 0;background:#0c0c0c;border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:.5rem .6rem}
-.kpi__label{font-size:.72rem;color:var(--muted);display:block}
-.kpi__value{font-size:1.15rem;font-weight:800}
-.kpi__value--small{font-size:.98rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.kpi--text{min-width:120px}
-.occ-mini__meter{height:10px;background:#121212;border:1px solid rgba(255,255,255,.08);border-radius:999px;overflow:hidden}
-.occ-mini__bar{height:100%;width:0%;background:linear-gradient(90deg,var(--cyan),var(--orange));transition:width .35s ease}
-.occ-mini__hint{margin-top:.4rem;font-size:.75rem;color:var(--muted);text-align:right}
-@media (max-width:700px){.occ-mini-wrap{position:relative;margin:.6rem 0}.occ-mini{width:100%}}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* Header */
+.ocupacion-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(6, 182, 212, 0.2);
+}
+
+.ocupacion-header h3 {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #06b6d4;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ocupacion-link {
+  font-size: 0.85rem;
+  color: #06b6d4;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: all 0.2s ease;
+}
+
+.ocupacion-link:hover {
+  color: #fff;
+  transform: translateX(3px);
+}
+
+/* Global section */
+.ocupacion-global {
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.1) 0%, rgba(8, 145, 178, 0.05) 100%);
+  border: 1px solid rgba(6, 182, 212, 0.3);
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.global-badge {
+  display: inline-block;
+  background: #06b6d4;
+  color: #000;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  letter-spacing: 1px;
+  margin-bottom: 0.75rem;
+}
+
+.global-numbers {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.global-count {
+  font-size: 2.5rem;
+  font-weight: 900;
+  background: linear-gradient(135deg, #06b6d4, #0891b2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.global-separator {
+  font-size: 1.5rem;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.global-capacity {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.global-label {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 0.75rem;
+}
+
+.global-meter {
+  height: 8px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.global-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #06b6d4, #0891b2);
+  border-radius: 999px;
+  transition: width 0.5s ease;
+}
+
+/* Selector de sucursales */
+.sucursal-selector {
+  margin-bottom: 1rem;
+}
+
+.sucursal-selector label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.sucursal-combo {
+  width: 100%;
+  background: rgba(12, 12, 12, 0.8);
+  color: #fff;
+  border: 1px solid rgba(6, 182, 212, 0.3);
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sucursal-combo:hover {
+  border-color: rgba(6, 182, 212, 0.5);
+  background: rgba(15, 15, 15, 0.9);
+}
+
+.sucursal-combo:focus {
+  border-color: #06b6d4;
+  box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.1);
+}
+
+/* Detalle de sucursal */
+.sucursal-detalle {
+  background: linear-gradient(135deg, rgba(12, 12, 12, 0.6) 0%, rgba(8, 8, 8, 0.8) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.sucursal-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 1rem;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin-bottom: 1rem;
+  border: 1px solid;
+  transition: all 0.3s ease;
+}
+
+.sucursal-badge i {
+  font-size: 0.6rem;
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.sucursal-name {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.95);
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.sucursal-name i {
+  color: #06b6d4;
+  font-size: 1rem;
+}
+
+.sucursal-numbers {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.suc-count {
+  font-size: 2.5rem;
+  font-weight: 900;
+  transition: color 0.3s ease;
+}
+
+.suc-sep {
+  font-size: 1.5rem;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.suc-capacity {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.sucursal-percentage {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  transition: color 0.3s ease;
+}
+
+.sucursal-meter {
+  height: 8px;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.sucursal-bar {
+  height: 100%;
+  border-radius: 999px;
+  transition: all 0.5s ease;
+}
+
+/* Empty state */
+.empty-state {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.empty-state i {
+  font-size: 2.5rem;
+  margin-bottom: 0.75rem;
+  opacity: 0.5;
+}
+
+.empty-state p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+/* Footer */
+.ocupacion-footer {
+  text-align: center;
+  font-size: 0.75rem;
+  color: rgba(6, 182, 212, 0.6);
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+.ocupacion-footer i {
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .ocupacion-dashboard-wrap {
+    position: relative;
+    margin: 0.75rem 12px 1.5rem;
+    justify-content: stretch;
+  }
+  
+  .ocupacion-card {
+    width: 100%;
+  }
+}
 </style>
 
 {% endblock %}

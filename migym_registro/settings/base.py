@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     'aplications.pagos',
     'aplications.rutina',
     'aplications.ocupacion',
+    'aplications.configuracion',
     'core',
     'aplications.usuarios',
     'rest_framework',

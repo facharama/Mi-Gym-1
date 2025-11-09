@@ -54,6 +54,7 @@ class Socio(models.Model):
 
     sucursal = models.ForeignKey(Sucursal, on_delete=models.PROTECT, max_length=100)
     estado = models.CharField(max_length=20, default="Activo")
+    activo = models.BooleanField(default=True)
     fecha_alta = models.DateField(auto_now_add=True)
 
     def __str__(self):

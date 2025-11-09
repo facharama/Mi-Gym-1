@@ -24,15 +24,9 @@ CSRF_TRUSTED_ORIGINS = [
 
 DATABASES = {
     "default": {
-        "ENGINE": "mssql",
-        "NAME": "Gym",
-        "HOST": "DESKTOP-VINM4D7",
-        "PORT": "",
-        "OPTIONS": {
-            "driver": "ODBC Driver 17 for SQL Server",
-            "extra_params": "Trusted_Connection=yes;Encrypt=no",
-        },
-    }
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
 }
  
 # Static files (CSS, JavaScript, Images)

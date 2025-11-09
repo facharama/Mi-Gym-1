@@ -1,29 +1,506 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>Ocupación Actual por Sucursal</h2>
 
-<table>
-  <thead>
-    <tr>
-      <th>Sucursal</th>
-      <th>Personas dentro</th>
-      <th>Estado</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for item in items %}
-      <tr>
-        <td>{{ item.sucursal.nombre }}</td>
-        <td>{{ item.ocupacion }}</td>
-        <td>{{ item.leyenda }}</td>
-      </tr>
-    {% empty %}
-      <tr><td colspan="3">No hay registros de accesos aún.</td></tr>
-    {% endfor %}
-  </tbody>
-</table>
+<style>
+/* Contenedor principal */
+.ocupacion-page-header {
+  margin-bottom: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 
-<p>
-  <a href="{% url 'ocupacion:ocupacion_registrar' %}">+ Registrar Acceso</a>
-</p>
+.ocupacion-page-header h2 {
+  color: var(--cyan);
+  font-weight: 700;
+  margin: 0;
+}
+
+/* Grid de cards de ocupación */
+.ocupacion-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .ocupacion-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .ocupacion-grid {
+    gap: 1rem;
+  }
+}
+
+/* Card individual de sucursal */
+.ocupacion-sucursal-card {
+  background: linear-gradient(135deg, rgba(26, 26, 26, 0.95) 0%, rgba(20, 20, 20, 0.98) 100%);
+  border: 2px solid rgba(6, 182, 212, 0.2);
+  border-radius: 20px;
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+  animation: pulse-border 3s ease-in-out infinite;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes pulse-border {
+  0%, 100% { border-color: rgba(6, 182, 212, 0.3); }
+  50% { border-color: rgba(6, 182, 212, 0.6); }
+}
+
+.ocupacion-sucursal-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #06b6d4, #0891b2, #06b6d4);
+  opacity: 0.6;
+}
+
+/* Header de la sucursal */
+.sucursal-header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.sucursal-nombre {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 0.5rem;
+}
+
+.ocupacion-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.2), rgba(8, 145, 178, 0.3));
+  border: 1px solid rgba(6, 182, 212, 0.4);
+  padding: 0.4rem 1rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #06b6d4;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.ocupacion-badge i {
+  animation: blink 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* Números grandes */
+.ocupacion-number-display {
+  text-align: center;
+  margin: 2rem 0;
+}
+
+.ocupacion-current {
+  font-size: 3.5rem;
+  font-weight: 900;
+  background: linear-gradient(135deg, #06b6d4, #0891b2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 20px rgba(6, 182, 212, 0.6));
+  animation: glow-pulse 2s ease-in-out infinite;
+}
+
+@keyframes glow-pulse {
+  0%, 100% { filter: drop-shadow(0 0 20px rgba(6, 182, 212, 0.6)); }
+  50% { filter: drop-shadow(0 0 30px rgba(6, 182, 212, 0.9)); }
+}
+
+.ocupacion-separator {
+  font-size: 2rem;
+  color: rgba(255, 255, 255, 0.3);
+  margin: 0 0.5rem;
+}
+
+.ocupacion-capacity {
+  font-size: 2rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.ocupacion-label {
+  display: block;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin-top: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Barra de progreso mejorada */
+.ocupacion-meter-enhanced {
+  margin: 1.5rem 0;
+}
+
+.ocupacion-meter-bar {
+  height: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.ocupacion-meter-fill {
+  height: 100%;
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  border-radius: 10px;
+}
+
+.ocupacion-meter-fill.level-green {
+  background: linear-gradient(90deg, #10b981, #059669);
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.6);
+}
+
+.ocupacion-meter-fill.level-yellow {
+  background: linear-gradient(90deg, #f59e0b, #d97706);
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.6);
+}
+
+.ocupacion-meter-fill.level-red {
+  background: linear-gradient(90deg, #ef4444, #dc2626);
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.6);
+}
+
+.ocupacion-percentage-text {
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #fff;
+  margin-top: 0.5rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Badge de estado */
+.badge-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.badge-status-green {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.badge-status-yellow {
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.badge-status-red {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+/* Botón de registrar acceso */
+.btn-registrar {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, #06b6d4, #0891b2);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  border: none;
+  box-shadow: 0 4px 12px rgba(6, 182, 212, 0.3);
+}
+
+.btn-registrar:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(6, 182, 212, 0.5);
+  color: white;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3rem;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 1.1rem;
+}
+
+.empty-state i {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  color: var(--cyan);
+  opacity: 0.3;
+}
+
+/* ============ MEDIA QUERIES RESPONSIVE ============ */
+
+/* Tablets (768px y menos) */
+@media (max-width: 768px) {
+  .ocupacion-page-header {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 1rem;
+  }
+
+  .ocupacion-page-header h2 {
+    font-size: 1.5rem;
+  }
+
+  .btn-registrar {
+    width: 100%;
+  }
+
+  .ocupacion-sucursal-card {
+    padding: 1.5rem;
+    border-radius: 15px;
+  }
+
+  .sucursal-nombre {
+    font-size: 1.3rem;
+  }
+
+  .ocupacion-current {
+    font-size: 3rem;
+  }
+
+  .ocupacion-capacity {
+    font-size: 1.8rem;
+  }
+
+  .ocupacion-separator {
+    font-size: 1.8rem;
+  }
+
+  .ocupacion-label {
+    font-size: 0.85rem;
+  }
+
+  .ocupacion-badge {
+    font-size: 0.7rem;
+    padding: 0.35rem 0.9rem;
+  }
+
+  .badge-status {
+    font-size: 0.85rem;
+    padding: 0.4rem 0.9rem;
+  }
+
+  .ocupacion-percentage-text {
+    font-size: 1.1rem;
+  }
+}
+
+/* Móviles (576px y menos) */
+@media (max-width: 576px) {
+  .ocupacion-page-header h2 {
+    font-size: 1.2rem;
+  }
+
+  .ocupacion-sucursal-card {
+    padding: 1.2rem;
+    border-radius: 12px;
+  }
+
+  .sucursal-nombre {
+    font-size: 1.1rem;
+  }
+
+  .ocupacion-number-display {
+    margin: 1.5rem 0;
+  }
+
+  .ocupacion-current {
+    font-size: 2.5rem;
+  }
+
+  .ocupacion-capacity {
+    font-size: 1.5rem;
+  }
+
+  .ocupacion-separator {
+    font-size: 1.5rem;
+  }
+
+  .ocupacion-label {
+    font-size: 0.8rem;
+    margin-top: 0.3rem;
+  }
+
+  .ocupacion-badge {
+    font-size: 0.65rem;
+    padding: 0.3rem 0.8rem;
+  }
+
+  .badge-status {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.8rem;
+    margin-top: 0.8rem;
+  }
+
+  .ocupacion-meter-enhanced {
+    margin: 1rem 0;
+  }
+
+  .ocupacion-meter-bar {
+    height: 18px;
+  }
+
+  .ocupacion-percentage-text {
+    font-size: 1rem;
+  }
+
+  .btn-registrar {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.9rem;
+  }
+
+  .empty-state {
+    padding: 2rem;
+    font-size: 1rem;
+  }
+
+  .empty-state i {
+    font-size: 2.5rem;
+  }
+}
+
+/* Móviles muy pequeños (400px y menos) */
+@media (max-width: 400px) {
+  .ocupacion-page-header h2 {
+    font-size: 1.1rem;
+  }
+
+  .ocupacion-sucursal-card {
+    padding: 1rem;
+  }
+
+  .sucursal-nombre {
+    font-size: 1rem;
+  }
+
+  .ocupacion-current {
+    font-size: 2rem;
+  }
+
+  .ocupacion-capacity {
+    font-size: 1.3rem;
+  }
+
+  .ocupacion-separator {
+    font-size: 1.3rem;
+  }
+
+  .ocupacion-label {
+    font-size: 0.75rem;
+  }
+
+  .ocupacion-badge {
+    font-size: 0.6rem;
+    padding: 0.25rem 0.7rem;
+  }
+
+  .badge-status {
+    font-size: 0.75rem;
+    padding: 0.35rem 0.7rem;
+  }
+
+  .ocupacion-meter-bar {
+    height: 15px;
+  }
+
+  .ocupacion-percentage-text {
+    font-size: 0.9rem;
+  }
+
+  .btn-registrar {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+  }
+}
+</style>
+
+<div class="ocupacion-page-header">
+  <h2><i class="bi bi-activity"></i> Ocupación en Tiempo Real</h2>
+  <a href="{% url 'ocupacion:ocupacion_registrar' %}" class="btn-registrar">
+    <i class="bi bi-plus-circle"></i> Registrar Acceso
+  </a>
+</div>
+
+{% if items %}
+<div class="ocupacion-grid">
+  {% for item in items %}
+  <div class="ocupacion-sucursal-card">
+    <div class="sucursal-header">
+      <h3 class="sucursal-nombre">{{ item.sucursal.nombre }}</h3>
+      <div class="ocupacion-badge">
+        <i class="bi bi-broadcast"></i> EN VIVO
+      </div>
+    </div>
+
+    <div class="ocupacion-number-display">
+      <span class="ocupacion-current">{{ item.ocupacion }}</span>
+      <span class="ocupacion-separator">/</span>
+      <span class="ocupacion-capacity">{{ item.capacidad }}</span>
+      <span class="ocupacion-label">Personas</span>
+    </div>
+
+    <div class="ocupacion-meter-enhanced">
+      <div class="ocupacion-meter-bar">
+        <div class="ocupacion-meter-fill level-{% if item.porcentaje < 40 %}green{% elif item.porcentaje < 70 %}yellow{% else %}red{% endif %}" 
+             style="width: {{ item.porcentaje }}%;">
+        </div>
+      </div>
+      <div class="ocupacion-percentage-text">{{ item.porcentaje }}%</div>
+    </div>
+
+    <div style="text-align: center;">
+      <div class="badge-status badge-status-{% if item.porcentaje < 40 %}green{% elif item.porcentaje < 70 %}yellow{% else %}red{% endif %}">
+        <i class="bi bi-{% if item.porcentaje < 40 %}check-circle{% elif item.porcentaje < 70 %}exclamation-triangle{% else %}x-circle{% endif %}"></i>
+        Ocupación {{ item.leyenda }}
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+  <i class="bi bi-inbox"></i>
+  <p>No hay registros de accesos aún.</p>
+</div>
+{% endif %}
+
 {% endblock %}

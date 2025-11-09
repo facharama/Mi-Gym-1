@@ -1,21 +1,29 @@
+// SCRIPT DESHABILITADO TEMPORALMENTE PARA DEBUGGING DEL SIDEBAR
+/*
 document.addEventListener('DOMContentLoaded', () => {
-  // Dejar el layout en modo colapsado por defecto
-  document.body.classList.add('sidebar-collapsed');
-
-  const leftSidebar = document.querySelector('.left-sidebar');
-
-  if (leftSidebar) {
-    // Abrir al entrar con el mouse
-    leftSidebar.addEventListener('mouseover', () => {
-      document.body.classList.add('sidebar-hover');
-    });
-
-    // Cerrar al salir con el mouse
-    leftSidebar.addEventListener('mouseout', () => {
-      document.body.classList.remove('sidebar-hover');
-    });
+  // Solo aplicar el estado si no está ya establecido
+  const sidebarState = localStorage.getItem('sidebarCollapsed');
+  if (sidebarState === null) {
+    // Primera visita, colapsar por defecto
+    document.body.classList.add('sidebar-collapsed');
+    localStorage.setItem('sidebarCollapsed', 'true');
+  } else if (sidebarState === 'true') {
+    document.body.classList.add('sidebar-collapsed');
+  } else {
+    document.body.classList.remove('sidebar-collapsed');
   }
 
-  // (Opcional) en pantallas táctiles sin hover, podrías luego
-  // implementar un botón para alternar 'sidebar-hover' con tap.
+  // DESHABILITADO: comportamiento de hover para evitar apertura automática
+  // const leftSidebar = document.querySelector('.left-sidebar');
+  // if (leftSidebar) {
+  //   leftSidebar.addEventListener('mouseover', () => {
+  //     if (document.body.classList.contains('sidebar-collapsed')) {
+  //       document.body.classList.add('sidebar-hover');
+  //     }
+  //   });
+  //   leftSidebar.addEventListener('mouseout', () => {
+  //     document.body.classList.remove('sidebar-hover');
+  //   });
+  // }
 });
+*/

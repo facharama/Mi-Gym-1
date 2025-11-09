@@ -1,11 +1,102 @@
-{% extends "base.html" %}
-{% block content %}
-<h2>{% if form.instance.pk %}Editar Rutina{% else %}Nueva Rutina{% endif %}</h2>
+{% extends "base_dash.html" %}
+{% load static %}
 
-<form method="post">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit">Guardar</button>
-  <a href="{% url 'socios:lista' %}">Cancelar</a>
-</form>
+{% block extra_css %}
+  {{ block.super }}
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="{% static 'css/migym-theme.css' %}">
+{% endblock %}
+
+{% block page_content %}
+<div class="container-fluid py-3">
+
+  <section class="mb-3">
+    <h1 class="h3 mb-1">{% if form.instance.pk %}Editar Rutina{% else %}Nueva Rutina{% endif %}</h1>
+    <p class="text-body-secondary m-0">Complete los datos de la rutina</p>
+  </section>
+
+  <section class="card shadow-sm">
+    <div class="card-body">
+      <form method="post" novalidate>
+        {% csrf_token %}
+        
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label for="{{ form.nombre.id_for_label }}" class="form-label">Nombre de la rutina *</label>
+            <input type="text" 
+                   name="{{ form.nombre.name }}" 
+                   id="{{ form.nombre.id_for_label }}" 
+                   class="form-control" 
+                   value="{{ form.nombre.value|default:'' }}"
+                   placeholder="Nombre de la rutina"
+                   required>
+            {% if form.nombre.errors %}
+              <div class="text-danger small mt-1">{{ form.nombre.errors.0 }}</div>
+            {% endif %}
+          </div>
+
+          <div class="col-md-6">
+            <label for="{{ form.objetivo.id_for_label }}" class="form-label">Objetivo</label>
+            <input type="text" 
+                   name="{{ form.objetivo.name }}" 
+                   id="{{ form.objetivo.id_for_label }}" 
+                   class="form-control" 
+                   value="{{ form.objetivo.value|default:'' }}"
+                   placeholder="Ej: Hipertrofia, Fuerza, Resistencia">
+            <small class="form-text text-muted">Objetivo de la rutina</small>
+            {% if form.objetivo.errors %}
+              <div class="text-danger small mt-1">{{ form.objetivo.errors.0 }}</div>
+            {% endif %}
+          </div>
+
+          <div class="col-md-6">
+            <label for="{{ form.creada_por.id_for_label }}" class="form-label">Creada por</label>
+            <select name="{{ form.creada_por.name }}" id="{{ form.creada_por.id_for_label }}" class="form-select">
+              <option value="">Seleccione un instructor...</option>
+              {% for value, label in form.creada_por.field.choices %}
+                {% if value %}
+                  <option value="{{ value }}" {% if form.creada_por.value == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                {% endif %}
+              {% endfor %}
+            </select>
+            {% if form.creada_por.errors %}
+              <div class="text-danger small mt-1">{{ form.creada_por.errors.0 }}</div>
+            {% endif %}
+          </div>
+
+          <div class="col-md-6">
+            <div class="form-check mt-4">
+              <input type="checkbox" 
+                     name="{{ form.activa.name }}" 
+                     id="{{ form.activa.id_for_label }}" 
+                     class="form-check-input"
+                     {% if form.activa.value %}checked{% endif %}>
+              <label class="form-check-label" for="{{ form.activa.id_for_label }}">
+                Rutina activa
+              </label>
+            </div>
+          </div>
+
+          <div class="col-12">
+            <label for="{{ form.observaciones.id_for_label }}" class="form-label">Observaciones</label>
+            <textarea name="{{ form.observaciones.name }}" 
+                      id="{{ form.observaciones.id_for_label }}" 
+                      class="form-control" 
+                      rows="3"
+                      placeholder="Observaciones adicionales">{{ form.observaciones.value|default:'' }}</textarea>
+            {% if form.observaciones.errors %}
+              <div class="text-danger small mt-1">{{ form.observaciones.errors.0 }}</div>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="mt-4 d-flex gap-2">
+          <button type="submit" class="btn btn-primary">Guardar</button>
+          <a href="{% url 'configuracion:rutinas_lista' %}" class="btn btn-secondary">Cancelar</a>
+        </div>
+      </form>
+    </div>
+  </section>
+
+</div>
 {% endblock %}

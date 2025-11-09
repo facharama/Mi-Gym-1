@@ -43,6 +43,7 @@
               <th scope="col">Plan</th>
               <th scope="col" class="text-end">Monto</th>
               <th scope="col">Método</th>
+              <th scope="col" class="text-center">Acciones</th>
             </tr>
           </thead>
           <tbody>
@@ -63,10 +64,15 @@
                   <span class="text-body-secondary">—</span>
                 {% endif %}
               </td>
+              <td class="text-center">
+                <a href="{% url 'pagos:detalle' pk=p.id %}" class="btn btn-sm btn-outline-primary" title="Ver detalle">
+                  <i class="bi bi-eye"></i> Ver
+                </a>
+              </td>
             </tr>
           {% empty %}
             <tr>
-              <td colspan="6" class="text-center py-4 text-body-secondary">
+              <td colspan="7" class="text-center py-4 text-body-secondary">
                 No hay pagos cargados.
               </td>
             </tr>

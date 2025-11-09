@@ -12,7 +12,7 @@ def asignar_rutina(request):
         form = RutinaAsignacionForm(request.POST)
         if form.is_valid():
             asig = form.save()
-            return redirect("socios_detalle", pk=asig.socio_id)
+            return redirect("socios:detalle", pk=asig.socio_id)
     else:
         form = RutinaAsignacionForm()
     return render(request, "rutina/form_asignacion.html", {"form": form})

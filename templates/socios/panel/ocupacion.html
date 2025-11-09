@@ -1,0 +1,533 @@
+{% extends "base_dash.html" %}
+{% load static %}
+
+{% block extra_css %}
+  {{ block.super }}
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="{% static 'css/migym-theme.css' %}">
+  <style>
+    /* Card principal con efecto pulsante */
+    .ocupacion-card-main {
+      background: linear-gradient(135deg, rgba(26, 26, 26, 0.95) 0%, rgba(20, 20, 20, 0.98) 100%);
+      border: 2px solid rgba(6, 182, 212, 0.2);
+      border-radius: 20px;
+      animation: pulse-border 3s ease-in-out infinite;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .ocupacion-card-main::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #06b6d4, #0891b2, #06b6d4);
+      opacity: 0.6;
+    }
+
+    @keyframes pulse-border {
+      0%, 100% { border-color: rgba(6, 182, 212, 0.3); }
+      50% { border-color: rgba(6, 182, 212, 0.6); }
+    }
+
+    /* Badge EN VIVO */
+    .ocupacion-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: linear-gradient(135deg, rgba(6, 182, 212, 0.2), rgba(8, 145, 178, 0.3));
+      border: 1px solid rgba(6, 182, 212, 0.4);
+      padding: 0.5rem 1.2rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #06b6d4;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      animation: pulse 2s ease-in-out infinite;
+      margin-bottom: 1.5rem;
+    }
+
+    .ocupacion-badge i {
+      animation: blink 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    /* Círculo con efecto */
+    .ocupacion-circle {
+      width: 280px;
+      height: 280px;
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      margin: 1rem auto 2rem;
+      border: 15px solid;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+      position: relative;
+    }
+
+    .ocupacion-circle.circle-green {
+      border-color: #10b981;
+      box-shadow: 0 0 60px rgba(16, 185, 129, 0.4);
+    }
+
+    .ocupacion-circle.circle-yellow {
+      border-color: #f59e0b;
+      box-shadow: 0 0 60px rgba(245, 158, 11, 0.4);
+    }
+
+    .ocupacion-circle.circle-red {
+      border-color: #ef4444;
+      box-shadow: 0 0 60px rgba(239, 68, 68, 0.4);
+    }
+
+    .ocupacion-number {
+      font-size: 5rem;
+      font-weight: 900;
+      line-height: 1;
+      filter: drop-shadow(0 0 20px currentColor);
+      animation: glow-pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes glow-pulse {
+      0%, 100% { filter: drop-shadow(0 0 20px currentColor); }
+      50% { filter: drop-shadow(0 0 35px currentColor); }
+    }
+
+    .ocupacion-text {
+      font-size: 1.2rem;
+      margin-top: 0.5rem;
+      color: rgba(255, 255, 255, 0.6);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* Números grandes para stats */
+    .stat-number {
+      font-size: 2.5rem;
+      font-weight: 900;
+      filter: drop-shadow(0 0 15px rgba(6, 182, 212, 0.5));
+    }
+
+    /* Barra de progreso mejorada */
+    .ocupacion-meter-enhanced {
+      margin: 2rem auto;
+      max-width: 600px;
+    }
+
+    .ocupacion-meter-bar {
+      height: 24px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      overflow: hidden;
+      position: relative;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .ocupacion-meter-fill {
+      height: 100%;
+      transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      border-radius: 12px;
+    }
+
+    .ocupacion-meter-fill.level-green {
+      background: linear-gradient(90deg, #10b981, #059669);
+      box-shadow: 0 0 25px rgba(16, 185, 129, 0.6);
+    }
+
+    .ocupacion-meter-fill.level-yellow {
+      background: linear-gradient(90deg, #f59e0b, #d97706);
+      box-shadow: 0 0 25px rgba(245, 158, 11, 0.6);
+    }
+
+    .ocupacion-meter-fill.level-red {
+      background: linear-gradient(90deg, #ef4444, #dc2626);
+      box-shadow: 0 0 25px rgba(239, 68, 68, 0.6);
+    }
+
+    /* Badge de estado mejorado */
+    .nivel-badge {
+      font-size: 1.2rem;
+      padding: 0.8rem 2rem;
+      border-radius: 20px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    /* Stats cards */
+    .stat-card {
+      background: rgba(26, 26, 26, 0.8);
+      border: 1px solid rgba(6, 182, 212, 0.2);
+      border-radius: 15px;
+      padding: 1.5rem;
+      transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+      border-color: rgba(6, 182, 212, 0.5);
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(6, 182, 212, 0.2);
+    }
+
+    .stat-label {
+      font-size: 0.9rem;
+      color: rgba(255, 255, 255, 0.6);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 0.5rem;
+    }
+
+    .text-green { color: #10b981 !important; }
+    .text-yellow { color: #f59e0b !important; }
+    .text-red { color: #ef4444 !important; }
+
+    .bg-green { background-color: rgba(16, 185, 129, 0.15) !important; border-color: rgba(16, 185, 129, 0.3) !important; }
+    .bg-yellow { background-color: rgba(245, 158, 11, 0.15) !important; border-color: rgba(245, 158, 11, 0.3) !important; }
+    .bg-red { background-color: rgba(239, 68, 68, 0.15) !important; border-color: rgba(239, 68, 68, 0.3) !important; }
+
+    /* RESPONSIVE - Tablets y móviles */
+    @media (max-width: 992px) {
+      .ocupacion-circle {
+        width: 220px;
+        height: 220px;
+        border-width: 12px;
+      }
+
+      .ocupacion-number {
+        font-size: 4rem;
+      }
+
+      .stat-number {
+        font-size: 2rem;
+      }
+
+      .nivel-badge {
+        font-size: 1rem;
+        padding: 0.6rem 1.5rem;
+      }
+
+      .ocupacion-meter-enhanced {
+        max-width: 100%;
+        padding: 0 1rem;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .ocupacion-card-main {
+        border-radius: 15px;
+        margin: 0;
+      }
+
+      .ocupacion-circle {
+        width: 200px;
+        height: 200px;
+        border-width: 10px;
+        margin: 1rem auto 1.5rem;
+      }
+
+      .ocupacion-number {
+        font-size: 3.5rem;
+      }
+
+      .ocupacion-text {
+        font-size: 1rem;
+      }
+
+      .stat-number {
+        font-size: 1.8rem;
+      }
+
+      .stat-card {
+        padding: 1rem;
+      }
+
+      .stat-label {
+        font-size: 0.8rem;
+      }
+
+      .nivel-badge {
+        font-size: 0.9rem;
+        padding: 0.5rem 1.2rem;
+      }
+
+      .ocupacion-badge {
+        font-size: 0.75rem;
+        padding: 0.4rem 1rem;
+      }
+
+      .ocupacion-meter-bar {
+        height: 20px;
+      }
+
+      /* Hacer columnas en una sola línea en tablets */
+      .row.g-3 .col-md-4 {
+        flex: 0 0 100%;
+        max-width: 100%;
+      }
+
+      .alert {
+        max-width: 100% !important;
+        margin: 0 1rem;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .container-fluid {
+        padding-left: 0.5rem !important;
+        padding-right: 0.5rem !important;
+      }
+
+      .ocupacion-card-main {
+        border-radius: 10px;
+      }
+
+      .ocupacion-card-main .card-body {
+        padding: 1.5rem 1rem !important;
+      }
+
+      .ocupacion-circle {
+        width: 180px;
+        height: 180px;
+        border-width: 8px;
+      }
+
+      .ocupacion-number {
+        font-size: 3rem;
+      }
+
+      .ocupacion-text {
+        font-size: 0.9rem;
+      }
+
+      .stat-number {
+        font-size: 1.5rem;
+      }
+
+      .stat-card {
+        padding: 0.8rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .stat-label {
+        font-size: 0.75rem;
+        margin-bottom: 0.3rem;
+      }
+
+      .nivel-badge {
+        font-size: 0.85rem;
+        padding: 0.5rem 1rem;
+      }
+
+      .ocupacion-badge {
+        font-size: 0.7rem;
+        padding: 0.3rem 0.8rem;
+      }
+
+      .ocupacion-meter-enhanced {
+        margin: 1.5rem 0.5rem;
+        padding: 0;
+      }
+
+      .ocupacion-meter-bar {
+        height: 16px;
+      }
+
+      /* Ajustar header en móviles */
+      section.d-flex {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 1rem;
+      }
+
+      section.d-flex h1 {
+        font-size: 1.3rem !important;
+      }
+
+      section.d-flex .btn {
+        width: 100%;
+      }
+
+      /* Botones */
+      .btn-lg {
+        font-size: 1rem !important;
+        padding: 0.7rem 1.2rem !important;
+      }
+
+      /* Hacer columnas full width */
+      .row.g-3 .col-md-4 {
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+      }
+
+      .alert {
+        font-size: 0.9rem;
+        padding: 0.8rem !important;
+        margin: 0.5rem !important;
+      }
+
+      .alert h5 {
+        font-size: 1rem;
+      }
+
+      /* Información adicional */
+      .card.shadow-sm .card-body {
+        padding: 1rem !important;
+      }
+
+      .card.shadow-sm h6 {
+        font-size: 0.95rem;
+      }
+
+      .card.shadow-sm ul li {
+        font-size: 0.85rem;
+        margin-bottom: 0.5rem !important;
+      }
+    }
+
+    /* Ajustes para pantallas muy pequeñas */
+    @media (max-width: 400px) {
+      .ocupacion-circle {
+        width: 160px;
+        height: 160px;
+        border-width: 6px;
+      }
+
+      .ocupacion-number {
+        font-size: 2.5rem;
+      }
+
+      .stat-number {
+        font-size: 1.3rem;
+      }
+
+      .ocupacion-card-main {
+        padding: 1rem;
+      }
+    }
+  </style>
+{% endblock %}
+
+{% block page_content %}
+<div class="container-fluid py-3">
+
+  <section class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <h1 class="h3 mb-1">Ocupación del Gimnasio</h1>
+      <p class="text-body-secondary m-0">{{ socio.sucursal.nombre }} - En tiempo real</p>
+    </div>
+    <div>
+      <a href="{% url 'socios:panel_socio' %}" class="btn btn-outline-secondary">← Volver al panel</a>
+    </div>
+  </section>
+
+  <section class="ocupacion-card-main">
+    <div class="card-body text-center py-5">
+      
+      <!-- Badge EN VIVO -->
+      <div class="ocupacion-badge">
+        <i class="bi bi-broadcast"></i> EN VIVO
+      </div>
+
+      <!-- Círculo de ocupación -->
+      <div class="ocupacion-circle circle-{% if nivel == 'bajo' %}green{% elif nivel == 'medio' %}yellow{% else %}red{% endif %}">
+        <div class="ocupacion-number text-{% if nivel == 'bajo' %}green{% elif nivel == 'medio' %}yellow{% else %}red{% endif %}">{{ porcentaje }}%</div>
+        <div class="ocupacion-text">Ocupación</div>
+      </div>
+
+      <!-- Barra de aforo -->
+      <div class="ocupacion-meter-enhanced">
+        <div class="ocupacion-meter-bar">
+          <div class="ocupacion-meter-fill level-{% if nivel == 'bajo' %}green{% elif nivel == 'medio' %}yellow{% else %}red{% endif %}" 
+               style="width: {{ porcentaje }}%;">
+          </div>
+        </div>
+      </div>
+
+      <!-- Nivel de ocupación -->
+      <div class="mb-4">
+        <span class="nivel-badge badge bg-{% if nivel == 'bajo' %}green{% elif nivel == 'medio' %}yellow{% else %}red{% endif %}">
+          <i class="bi bi-{% if nivel == 'bajo' %}check-circle{% elif nivel == 'medio' %}exclamation-triangle{% else %}x-circle{% endif %}"></i>
+          Ocupación {{ nivel_texto }}
+        </span>
+      </div>
+
+      <!-- Estadísticas -->
+      <div class="row g-3 justify-content-center mb-4">
+        <div class="col-md-4">
+          <div class="stat-card">
+            <div class="stat-label">Personas Actuales</div>
+            <div class="stat-number text-{% if nivel == 'bajo' %}green{% elif nivel == 'medio' %}yellow{% else %}red{% endif %}">{{ ocupacion_actual }}</div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="stat-card">
+            <div class="stat-label">Aforo Máximo</div>
+            <div class="stat-number" style="color: #06b6d4;">{{ aforo_maximo }}</div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="stat-card">
+            <div class="stat-label">Lugares Disponibles</div>
+            <div class="stat-number text-green">{{ aforo_maximo|add:"-"|add:ocupacion_actual }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recomendación -->
+      <div class="alert alert-{{ nivel_color }} d-inline-block" style="max-width: 600px;">
+        {% if nivel == 'bajo' %}
+          <h5 class="alert-heading">✅ ¡Buen momento para entrenar!</h5>
+          <p class="mb-0">El gimnasio tiene poca gente. Es un horario ideal para aprovechar todos los equipos.</p>
+        {% elif nivel == 'medio' %}
+          <h5 class="alert-heading">⚠️ Ocupación moderada</h5>
+          <p class="mb-0">Hay un nivel medio de personas. Algunos equipos pueden estar ocupados.</p>
+        {% else %}
+          <h5 class="alert-heading">🔴 Alta ocupación</h5>
+          <p class="mb-0">El gimnasio está con mucha gente. Si podés, considerá venir en otro horario para mayor comodidad.</p>
+        {% endif %}
+      </div>
+
+      <!-- Botón de actualizar -->
+      <div class="mt-4">
+        <button onclick="location.reload()" class="btn btn-primary btn-lg">
+          🔄 Actualizar datos
+        </button>
+        <p class="text-muted small mt-2">Los datos se actualizan en tiempo real</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Información adicional -->
+  <section class="card shadow-sm mt-3">
+    <div class="card-body">
+      <h6 class="card-title">ℹ️ Información sobre la ocupación</h6>
+      <ul class="mb-0">
+        <li class="mb-2"><strong>Ocupación Baja (Verde):</strong> Menos del {{ socio.sucursal.umbral_bajo_pct }}% de capacidad. Horario ideal para entrenar.</li>
+        <li class="mb-2"><strong>Ocupación Media (Amarillo):</strong> Entre {{ socio.sucursal.umbral_bajo_pct }}% y {{ socio.sucursal.umbral_medio_pct }}% de capacidad. Puede haber esperas en algunos equipos.</li>
+        <li class="mb-0"><strong>Ocupación Alta (Rojo):</strong> Más del {{ socio.sucursal.umbral_medio_pct }}% de capacidad. Recomendamos asistir en otro horario si es posible.</li>
+      </ul>
+    </div>
+  </section>
+
+</div>
+{% endblock %}

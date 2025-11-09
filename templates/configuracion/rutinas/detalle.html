@@ -1,0 +1,129 @@
+{% extends "base_dash.html" %}
+{% load static %}
+
+{% block extra_css %}
+  {{ block.super }}
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="{% static 'css/migym-theme.css' %}">
+  <style>
+    .dia-card {
+      border-left: 4px solid #0d6efd;
+    }
+  </style>
+{% endblock %}
+
+{% block page_content %}
+<div class="container-fluid py-3">
+
+  <section class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <h1 class="h3 mb-1">{{ rutina.nombre }}</h1>
+      <p class="text-body-secondary m-0">
+        {% if rutina.objetivo %}Objetivo: {{ rutina.objetivo }} | {% endif %}
+        {% if rutina.creada_por %}Creada por: {{ rutina.creada_por.user.get_full_name|default:rutina.creada_por.user.username }}{% endif %}
+      </p>
+    </div>
+    <div class="d-flex gap-2">
+      <a href="{% url 'configuracion:rutina_dia_agregar' rutina.pk %}" class="btn btn-primary">+ Agregar día</a>
+      <a href="{% url 'configuracion:rutina_editar' rutina.pk %}" class="btn btn-secondary">Editar rutina</a>
+      <a href="{% url 'configuracion:rutinas_lista' %}" class="btn btn-outline-secondary">Volver</a>
+    </div>
+  </section>
+
+  {% if rutina.observaciones %}
+  <div class="alert alert-info">
+    <strong>Observaciones:</strong> {{ rutina.observaciones }}
+  </div>
+  {% endif %}
+
+  {% if dias %}
+    {% for dia in dias %}
+    <section class="card shadow-sm mb-3 dia-card">
+      <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <div>
+          <h5 class="mb-0">
+            {% if dia.dia_semana == 1 %}Lunes
+            {% elif dia.dia_semana == 2 %}Martes
+            {% elif dia.dia_semana == 3 %}Miércoles
+            {% elif dia.dia_semana == 4 %}Jueves
+            {% elif dia.dia_semana == 5 %}Viernes
+            {% elif dia.dia_semana == 6 %}Sábado
+            {% elif dia.dia_semana == 7 %}Domingo
+            {% endif %}
+            (Día {{ dia.dia_semana }})
+          </h5>
+          {% if dia.observaciones %}
+            <small class="text-muted">{{ dia.observaciones }}</small>
+          {% endif %}
+        </div>
+        <div class="d-flex gap-2">
+          <a href="{% url 'configuracion:rutina_detalle_agregar' dia.pk %}" class="btn btn-sm btn-success">+ Ejercicio</a>
+          <form method="post"
+                action="{% url 'configuracion:rutina_dia_eliminar' dia.pk %}"
+                class="d-inline"
+                data-confirm="¿Eliminar este día y todos sus ejercicios?"
+                data-confirm-ok="Eliminar"
+                data-confirm-cancel="Cancelar">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-sm btn-outline-danger">Eliminar día</button>
+          </form>
+        </div>
+      </div>
+
+      {% if dia.detalles.all %}
+      <div class="table-responsive">
+        <table class="table table-sm table-hover align-middle mb-0">
+          <thead>
+            <tr>
+              <th style="width:60px">Orden</th>
+              <th>Ejercicio</th>
+              <th>Series</th>
+              <th>Repeticiones</th>
+              <th>Tiempo (seg)</th>
+              <th>Descanso (seg)</th>
+              <th>Observaciones</th>
+              <th class="text-end" style="width:180px">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for detalle in dia.detalles.all %}
+            <tr>
+              <td><span class="badge bg-secondary">{{ detalle.orden }}</span></td>
+              <td><strong>{{ detalle.ejercicio.nombre }}</strong></td>
+              <td>{{ detalle.series|default:"-" }}</td>
+              <td>{{ detalle.repeticiones|default:"-" }}</td>
+              <td>{{ detalle.tiempo_seg|default:"-" }}</td>
+              <td>{{ detalle.descanso_seg|default:"-" }}</td>
+              <td>{{ detalle.observaciones|truncatewords:5|default:"-" }}</td>
+              <td class="text-end">
+                <a href="{% url 'configuracion:rutina_detalle_editar' detalle.pk %}" class="btn btn-sm btn-primary">Editar</a>
+                <form method="post"
+                      action="{% url 'configuracion:rutina_detalle_eliminar' detalle.pk %}"
+                      class="d-inline"
+                      data-confirm="¿Eliminar ejercicio {{ detalle.ejercicio.nombre }}?"
+                      data-confirm-ok="Eliminar"
+                      data-confirm-cancel="Cancelar">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-sm btn-outline-danger">×</button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="card-body text-muted text-center">
+        No hay ejercicios en este día. <a href="{% url 'configuracion:rutina_detalle_agregar' dia.pk %}">Agregar ejercicio</a>
+      </div>
+      {% endif %}
+    </section>
+    {% endfor %}
+  {% else %}
+    <div class="alert alert-warning">
+      Esta rutina no tiene días configurados. <a href="{% url 'configuracion:rutina_dia_agregar' rutina.pk %}" class="alert-link">Agregar primer día</a>
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}

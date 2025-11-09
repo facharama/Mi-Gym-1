@@ -1,0 +1,88 @@
+{% extends "base_dash.html" %}
+{% load static %}
+
+{% block extra_css %}
+  {{ block.super }}
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="{% static 'css/migym-theme.css' %}">
+{% endblock %}
+
+{% block page_content %}
+<div class="container-fluid py-3">
+
+  <section class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <h1 class="h3 mb-1">Planes</h1>
+      <p class="text-body-secondary m-0">Gestión de planes de suscripción</p>
+    </div>
+    <div>
+      <a href="{% url 'configuracion:plan_crear' %}"
+         class="btn btn-primary"
+         data-confirm="¿Crear un nuevo plan?"
+         data-confirm-ok="Sí, crear"
+         data-confirm-cancel="Cancelar">+ Nuevo plan</a>
+    </div>
+  </section>
+
+  <section class="card shadow-sm">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Duración (días)</th>
+            <th>Precio</th>
+            <th>Certificado</th>
+            <th>Estado</th>
+            <th class="text-end" style="width:220px">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for plan in planes %}
+          <tr>
+            <td><strong>{{ plan.nombre }}</strong><br><small class="text-muted">{{ plan.descripcion|truncatewords:10 }}</small></td>
+            <td>{{ plan.duracion_dias }}</td>
+            <td>${{ plan.precio }}</td>
+            <td>
+              {% if plan.requiere_certificado %}
+                <span class="badge bg-warning">Requerido</span>
+              {% else %}
+                <span class="badge bg-secondary">No</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if plan.activo %}
+                <span class="badge bg-success">Activo</span>
+              {% else %}
+                <span class="badge bg-danger">Inactivo</span>
+              {% endif %}
+            </td>
+            <td class="text-end d-flex justify-content-end gap-2">
+              <a class="btn btn-sm btn-primary"
+                 href="{% url 'configuracion:plan_editar' plan.pk %}"
+                 data-confirm="¿Editar plan {{ plan.nombre }}?"
+                 data-confirm-ok="Editar"
+                 data-confirm-cancel="Cancelar">Editar</a>
+              <form method="post"
+                    action="{% url 'configuracion:plan_eliminar' plan.pk %}"
+                    class="d-inline"
+                    data-confirm="¿Eliminar el plan {{ plan.nombre }}? Esta acción no se puede deshacer."
+                    data-confirm-ok="Eliminar"
+                    data-confirm-cancel="Cancelar">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-sm btn-outline-danger">Eliminar</button>
+              </form>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="6" class="text-muted text-center py-4">No hay planes registrados.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+</div>
+{% endblock %}

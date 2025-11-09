@@ -7,13 +7,77 @@
 
 {% block extra_css %}
   {# Tus estilos existentes #}
-  <link rel="stylesheet" href="{% static 'css/nav_home.css' %}">
-  <link rel="stylesheet" href="{% static 'css/sidebar_admin.css' %}">
+  <link rel="stylesheet" href="{% static 'css/nav_home.css' %}?v={{ request.GET.timestamp|default:'1' }}">
+  <link rel="stylesheet" href="{% static 'css/sidebar_admin.css' %}?v=20251104">
+  <style>
+    /* Compensar navbar fijo */
+    body {
+      padding-top: 64px !important;
+    }
+    
+    /* Botón hamburguesa del sidebar en posición del navbar */
+    .mobile-sidebar-btn {
+      display: none;
+      position: fixed;
+      top: 12px;
+      right: 15px;
+      z-index: 99999999;
+      width: 45px;
+      height: 45px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+      padding: 8px;
+      transition: all 0.3s ease;
+    }
+    
+    .mobile-sidebar-btn span {
+      display: block;
+      width: 28px;
+      height: 3px;
+      background: #06b6d4;
+      border-radius: 2px;
+      transition: all 0.3s ease;
+    }
+    
+    .mobile-sidebar-btn:hover span {
+      background: #fff;
+    }
+    
+    /* Ocultar el botón del navbar en dashboard */
+    .menu-toggle {
+      display: none !important;
+    }
+    
+    @media (max-width: 768px) {
+      .mobile-sidebar-btn {
+        display: flex !important;
+      }
+    }
+  </style>
 {% endblock %}
 
 {% block content %}
-  {# Sidebar permanente a la izquierda #}
-  {% include "partials/sidebar_admin.html" %}
+  {# Overlay para cerrar sidebar en móviles #}
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+  {# Botón flotante para abrir sidebar en móvil #}
+  <button id="mobile-sidebar-toggle" class="mobile-sidebar-btn" aria-label="Menú">
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+
+  {# Sidebar permanente a la izquierda - diferente según el tipo de usuario #}
+  {% if user.is_staff or user.is_superuser %}
+    {% include "partials/sidebar_admin.html" %}
+  {% else %}
+    {% include "partials/sidebar_socio.html" %}
+  {% endif %}
 
 
   {# Sumamos utilidades Bootstrap sin tocar tu layout #}
@@ -25,21 +89,164 @@
 {% endblock %}
 
 {% block extra_js %}
+  <!-- Script de confirmación - PRIMERO -->
+  <script src="{% static 'js/mg-confirm.js' %}"></script>
 
   {# === Estilos y scripts existentes === #}
   <script>document.documentElement.setAttribute('data-bs-theme','migym');</script>
 
   <script>
-  /* === Sidebar: colapsar/expandir y submenús === */
+  /* === SIDEBAR: CONTROL SIMPLE Y FUNCIONAL === */
+  
   document.addEventListener("DOMContentLoaded", () => {
     const body = document.body;
-    const toggle = document.getElementById("sidebar-toggle");
-    const groupToggles = document.querySelectorAll(".ls-group-toggle");
-    body.classList.add("sidebar-collapsed");
-
-    if (toggle) toggle.addEventListener("click", () => body.classList.toggle("sidebar-collapsed"));
-    groupToggles.forEach(btn => btn.addEventListener("click", () => btn.parentElement.classList.toggle("open")));
+    const sidebar = document.querySelector('.left-sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
+    const isMobile = () => window.innerWidth <= 768;
+    
+    // Limpiar localStorage antiguo
+    localStorage.removeItem('sidebarCollapsed');
+    
+    // Función para colapsar
+    function collapseSidebar() {
+      body.classList.add('sidebar-collapsed');
+      console.log("➡️ Sidebar colapsado");
+    }
+    
+    // Función para expandir
+    function expandSidebar() {
+      body.classList.remove('sidebar-collapsed');
+      console.log("⬅️ Sidebar expandido");
+    }
+    
+    // Estado inicial: SIEMPRE colapsado
+    collapseSidebar();
+    
+    // Buscar botones toggle
+    const logo = document.querySelector('#sidebar-toggle') || document.querySelector('.brand-circle');
+    const mobileBtn = document.getElementById('mobile-sidebar-toggle');
+    
+    // Función toggle para usar en ambos botones
+    function toggleSidebar(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      const isCurrentlyCollapsed = body.classList.contains('sidebar-collapsed');
+      console.log("🖱️ Click en toggle - Estado actual:", isCurrentlyCollapsed ? "colapsado" : "expandido");
+      
+      if (isCurrentlyCollapsed) {
+        expandSidebar();
+      } else {
+        collapseSidebar();
+      }
+    }
+    
+    // Conectar eventos
+    if (logo) {
+      logo.addEventListener("click", toggleSidebar);
+    }
+    
+    if (mobileBtn) {
+      mobileBtn.addEventListener("click", toggleSidebar);
+      console.log("✅ Botón móvil conectado");
+    }
+    
+    // Cerrar en móvil al hacer click en overlay
+    if (overlay) {
+      overlay.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (isMobile()) {
+          collapseSidebar();
+        }
+      });
+    }
+    
+    // Cerrar en móvil al hacer click fuera
+    if (sidebar) {
+      document.addEventListener('click', function(e) {
+        const isCurrentlyExpanded = !body.classList.contains('sidebar-collapsed');
+        if (isMobile() && isCurrentlyExpanded) {
+          if (!sidebar.contains(e.target) && !logo.contains(e.target)) {
+            collapseSidebar();
+          }
+        }
+      });
+      
+      // Prevenir que clicks dentro cierren el sidebar
+      sidebar.addEventListener('click', function(e) {
+        e.stopPropagation();
+      });
+    }
+    
+    // Cerrar al cambiar a móvil
+    window.addEventListener('resize', function() {
+      const isCurrentlyExpanded = !body.classList.contains('sidebar-collapsed');
+      if (isMobile() && isCurrentlyExpanded) {
+        collapseSidebar();
+      }
+    });
+    
+    // Submenús normales
+    document.querySelectorAll(".ls-group-toggle").forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const group = btn.parentElement;
+        const wasOpen = group.classList.contains("open");
+        
+        // Cerrar todos los otros grupos
+        document.querySelectorAll(".ls-group.open").forEach(g => {
+          if(g !== group) g.classList.remove("open");
+        });
+        
+        // Toggle el grupo actual
+        group.classList.toggle("open");
+        
+        // Si se abrió un grupo, expandir el sidebar
+        if(!wasOpen && group.classList.contains("open")){
+          body.classList.remove('sidebar-collapsed');
+          sidebarExpandido = true;
+          localStorage.setItem('sidebarCollapsed', 'false');
+        }
+      });
+    });
+    
+    console.log("🎉 Control simple configurado");
   });
+  
+  // CSS para eliminar TODOS los hovers y transiciones
+  const style = document.createElement('style');
+  style.textContent = `
+    .left-sidebar {
+      transition: none !important;
+      -webkit-transition: none !important;
+    }
+    .dash-container {
+      transition: none !important;
+      -webkit-transition: none !important;
+    }
+    
+    /* Eliminar COMPLETAMENTE hover del sidebar */
+    .left-sidebar:hover {
+      width: 78px !important;
+    }
+    
+    .sidebar-collapsed .left-sidebar:hover {
+      width: 78px !important;
+    }
+    
+    /* Forzar que siempre esté colapsado a menos que se expanda manualmente */
+    body.sidebar-collapsed .left-sidebar {
+      width: 78px !important;
+    }
+    
+    /* Eliminar cualquier clase hover */
+    .sidebar-hover .left-sidebar {
+      width: 78px !important;
+    }
+  `;
+  document.head.appendChild(style);
+  
   </script>
 
   <script>

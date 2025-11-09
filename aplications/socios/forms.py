@@ -133,37 +133,74 @@ class SocioEditForm(forms.ModelForm):
         self.fields["last_name"].widget.attrs.update({"class": "form-control"})
         self.fields["email"].widget.attrs.update({"class": "form-control"})
 
+    def clean_dni(self):
+        dni = str(self.cleaned_data.get("dni", "")).strip()
+        if not dni.isdigit():
+            raise forms.ValidationError("El DNI debe contener solo números.")
+        if not (7 <= len(dni) <= 10):
+            raise forms.ValidationError("El DNI debe tener entre 7 y 10 dígitos.")
+        return dni
+
     def clean(self):
         data  = super().clean()
         dni   = (data.get("dni") or "").strip()
         email = (data.get("email") or "").strip()
 
-        qs = Socio.objects.exclude(pk=self.instance.pk)
-        if dni and qs.filter(dni__iexact=dni).exists():
-            self.add_error("dni", "Este DNI ya está registrado como socio.")
-        if email and qs.filter(email__iexact=email).exists():
-            self.add_error("email", "Este email ya está registrado como socio.")
+        # Obtener valores originales para comparar
+        dni_original = self.instance.dni if self.instance else None
+        email_original = self.instance.email if self.instance else None
+        
+        # Solo validar DNI si cambió
+        if dni and dni != dni_original:
+            # Validar que no exista otro SOCIO con el mismo DNI
+            if Socio.objects.exclude(pk=self.instance.pk).filter(dni__iexact=dni).exists():
+                self.add_error("dni", "Este DNI ya está registrado en otro socio.")
+            # Validar que no exista otro USER con ese DNI como username
+            user_qs = User.objects.all()
+            if self.instance and self.instance.user_id:
+                user_qs = user_qs.exclude(pk=self.instance.user_id)
+            if user_qs.filter(username__iexact=dni).exists():
+                self.add_error("dni", "Ya existe otro usuario con este DNI.")
+        
+        # Solo validar email si cambió
+        if email and email.lower() != (email_original or "").lower():
+            # Validar que no exista otro SOCIO con el mismo email
+            if Socio.objects.exclude(pk=self.instance.pk).filter(email__iexact=email).exists():
+                self.add_error("email", "Este email ya está registrado en otro socio.")
+            # Validar que no exista otro USER con ese email
+            user_qs = User.objects.all()
+            if self.instance and self.instance.user_id:
+                user_qs = user_qs.exclude(pk=self.instance.user_id)
+            if user_qs.filter(email__iexact=email).exists():
+                self.add_error("email", "Ya existe otro usuario con este email.")
 
-        # Si existiera otro User con ese DNI/email:
-        if User.objects.filter(Q(username__iexact=dni) | Q(email__iexact=email)).exclude(pk=getattr(self.instance.user, "pk", None)).exists():
-            if dni:   self.add_error("dni", "Ya existe un usuario con este DNI.")
-            if email: self.add_error("email", "Ya existe un usuario con este email.")
-
-        if self.errors:
-            raise forms.ValidationError("No se pudo guardar: hay datos duplicados.")
         return data
 
     def save(self, commit=True):
         socio = super().save(commit=False)
+        
+        # Actualizar estado basado en el checkbox
         socio.estado = "Activo" if self.cleaned_data.get("activo") else "Inactivo"
+        socio.activo = self.cleaned_data.get("activo", True)
+        
+        # Sincronizar campos de nombre y email en el modelo Socio
+        socio.nombre = self.cleaned_data.get("first_name", "")
+        socio.apellido = self.cleaned_data.get("last_name", "")
+        socio.email = self.cleaned_data.get("email", "")
+        
         if commit:
             socio.save()
+        
+        # Sincronizar con el User asociado si existe
         if socio.user_id:
             u = socio.user
             u.first_name = self.cleaned_data.get("first_name", u.first_name)
             u.last_name  = self.cleaned_data.get("last_name",  u.last_name)
             u.email      = self.cleaned_data.get("email",      u.email)
+            u.username   = socio.dni  # Asegurar que el username sea el DNI
+            u.is_active  = socio.activo  # Sincronizar estado activo
             u.save()
+        
         return socio
 
 
