@@ -88,6 +88,10 @@ def ocupacion_actual(request):
 def simulador(request):
     return render(request, "ocupacion/simulador.html")
 
+def simulador_qr(request):
+    """Simulador con escáner QR"""
+    return render(request, "ocupacion/simulador_qr.html")
+
 # -------------------------------------------------------------------
 # API para el simulador: registrar IN/OUT y consultar ocupación actual
 # (Django puro, sin DRF; si usás DRF, lo migramos fácil más adelante)
@@ -111,15 +115,24 @@ def access_event(request):
     if not member_code or atype not in ("IN", "OUT"):
         return JsonResponse({"detail": "member_code y type son obligatorios (IN/OUT)"}, status=400)
 
-    # 1) Buscar socio por DNI, fallback username
+    # 1) Buscar socio por DNI, username o email (para QR)
     from aplications.socios.models import Socio, Sucursal
-    try:
-        socio = Socio.objects.get(dni=member_code)
-    except Socio.DoesNotExist:
+    socio = None
+    
+    # Intentar por email primero (para QR)
+    if '@' in member_code:
+        socio = Socio.objects.filter(email=member_code).first()
+    
+    # Si no, intentar por DNI
+    if not socio:
         try:
-            socio = Socio.objects.get(user__username=member_code)
+            socio = Socio.objects.get(dni=member_code)
         except Socio.DoesNotExist:
-            return JsonResponse({"detail": "member not found (dni/username)"}, status=404)
+            # Finalmente por username
+            try:
+                socio = Socio.objects.get(user__username=member_code)
+            except Socio.DoesNotExist:
+                return JsonResponse({"detail": "member not found (email/dni/username)"}, status=404)
 
     # 2) Resolver sucursal
     sucursal = None
@@ -130,18 +143,58 @@ def access_event(request):
     if not sucursal:
         return JsonResponse({"detail": "no hay sucursal disponible (creá una en /admin)"}, status=400)
 
-    # 3) Crear movimiento
-    try:
-        from django.utils import timezone
-        from .models import Acceso
+    # 3) AUTO-DETECTAR tipo según último acceso (para QR)
+    from django.utils import timezone
+    from .models import Acceso, ActiveSession
+    
+    # Si la fuente es QR, ignorar el type del request y auto-detectar
+    source = data.get("source", "")
+    if source == "QR":
+        ultimo_acceso = Acceso.objects.filter(socio=socio).order_by('-fecha_hora').first()
+        if ultimo_acceso and ultimo_acceso.tipo == "Ingreso":
+            tipo = "Egreso"
+            atype = "OUT"
+        else:
+            tipo = "Ingreso"
+            atype = "IN"
+    else:
+        # Para RFID y otros, usar el type del request
         tipo = "Ingreso" if atype == "IN" else "Egreso"
+    
+    # 4) Crear movimiento en Acceso
+    try:
+        now = timezone.now()
         Acceso.objects.create(
             socio=socio,
             sucursal=sucursal,
             tipo=tipo,
-            fecha_hora=timezone.now()
+            fecha_hora=now
         )
-        return JsonResponse({"status": "ok"})
+        
+        # 5) Actualizar ActiveSession (para que occupancy_current funcione igual que el simulador original)
+        if atype == "IN":
+            session, created = ActiveSession.objects.get_or_create(
+                member=socio, 
+                defaults={"check_in_at": now}
+            )
+            session.status = "ACTIVE"
+            session.check_in_at = now
+            session.check_out_at = None
+            session.save()
+        else:  # OUT
+            try:
+                session = ActiveSession.objects.get(member=socio, status="ACTIVE")
+                session.check_out_at = now
+                session.status = "CLOSED"
+                session.save()
+            except ActiveSession.DoesNotExist:
+                pass  # No hay sesión activa
+        
+        return JsonResponse({
+            "status": "ok",
+            "socio_nombre": socio.user.get_full_name() or socio.nombre,
+            "tipo_registro": tipo
+        })
     except Exception as e:
         # Log y respuesta clara
         traceback.print_exc()
@@ -156,31 +209,21 @@ def occupancy_current(request):
     - ?sucursal_id=1 -> cuenta y capacidad de esa sucursal
     - sin sucursal_id -> cuenta total y capacidad total (suma de aforos)
     Respuesta: { "count": N, "capacity": M, "sucursal_id": "..." }
+    
+    Usa ActiveSession como el simulador original.
     """
+    from .models import ActiveSession
+    
     sucursal_id = request.GET.get("sucursal_id")
 
-    # Subconsulta: último tipo (Ingreso/Egreso) por (socio, sucursal)
-    ultimo_tipo_subq = (
-        Acceso.objects
-        .filter(socio_id=OuterRef("socio_id"), sucursal_id=OuterRef("sucursal_id"))
-        .order_by("-fecha_hora")
-        .values("tipo")[:1]
-    )
-
-    # Base: sólo los que su último movimiento fue "Ingreso"
-    base = (
-        Acceso.objects
-        .values("socio_id", "sucursal_id")
-        .distinct()
-        .annotate(ultimo_tipo=Subquery(ultimo_tipo_subq))
-        .filter(ultimo_tipo="Ingreso")
-    )
-
-    # Filtrado opcional por sucursal
+    # Contar sesiones activas
+    active_sessions = ActiveSession.objects.filter(status="ACTIVE")
+    
     if sucursal_id:
-        base = base.filter(sucursal_id=sucursal_id)
-
-    count = base.values("socio_id").count()
+        # Filtrar por sucursal del socio
+        active_sessions = active_sessions.filter(member__sucursal_id=sucursal_id)
+    
+    count = active_sessions.count()
 
     # ---- capacidad ----
     # Si viene sucursal_id: devolver aforo de esa sucursal

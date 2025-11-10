@@ -27,6 +27,11 @@
       <span>Ocupación</span>
     </a>
 
+    <a href="{% url 'socios:mi_qr' %}" class="ls-item {% if current == 'mi_qr' %}active{% endif %}">
+      <svg viewBox="0 0 24 24" class="ico"><path d="M3 11h8V3H3v8zm2-6h4v4H5V5zM3 21h8v-8H3v8zm2-6h4v4H5v-4zM13 3v8h8V3h-8zm6 6h-4V5h4v4zM13 13h2v2h-2v-2zm2 2h2v2h-2v-2zm2-2h2v2h-2v-2zm0 4h2v2h-2v-2zm-4 0h2v2h-2v-2zm6 0h2v2h-2v-2zm-2 2h2v2h-2v-2z" fill="currentColor"/></svg>
+      <span>Mi QR</span>
+    </a>
+
     <form method="post" action="{% url 'logout' %}">
       {% csrf_token %}
       <button type="submit" class="ls-item danger">

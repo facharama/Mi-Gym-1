@@ -44,33 +44,16 @@ def role_redirect(request):
 @login_required
 @role_required("Administrador")
 def admin_dashboard(request):
-    from django.db.models import OuterRef, Subquery, Count
-    from aplications.ocupacion.models import Acceso, Sucursal
+    from aplications.ocupacion.models import ActiveSession, Sucursal
     
-    # Subconsulta: para cada (socio, sucursal), traemos el TIPO del último movimiento
-    ultimo_tipo_subq = (
-        Acceso.objects
-        .filter(socio_id=OuterRef("socio_id"), sucursal_id=OuterRef("sucursal_id"))
-        .order_by("-fecha_hora")
-        .values("tipo")[:1]
-    )
-
-    # Filtramos solo los casos cuyo último movimiento fue 'Ingreso'
-    ultimos_ingreso = (
-        Acceso.objects
-        .values("socio_id", "sucursal_id")
-        .distinct()
-        .annotate(ultimo_tipo=Subquery(ultimo_tipo_subq))
-        .filter(ultimo_tipo="Ingreso")
-    )
-
+    # Usar ActiveSession (igual que el simulador)
+    active_sessions = ActiveSession.objects.filter(status="ACTIVE").select_related('member__sucursal')
+    
     # Conteo por sucursal
-    conteo_por_sucursal = (
-        ultimos_ingreso
-        .values("sucursal_id")
-        .annotate(dentro=Count("socio_id"))
-    )
-    dentro_map = {row["sucursal_id"]: row["dentro"] for row in conteo_por_sucursal}
+    dentro_map = {}
+    for session in active_sessions:
+        sucursal_id = session.member.sucursal_id
+        dentro_map[sucursal_id] = dentro_map.get(sucursal_id, 0) + 1
 
     # Armamos respuesta para cada sucursal
     sucursales_data = []

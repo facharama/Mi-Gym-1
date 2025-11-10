@@ -465,3 +465,46 @@ def ocupacion_gimnasio(request):
     }
     
     return render(request, 'socios/panel/ocupacion.html', context)
+
+
+@login_required
+def mi_qr(request):
+    """Genera y muestra el código QR del socio para acceso al gimnasio"""
+    try:
+        socio = request.user.perfil_socio
+    except:
+        messages.error(request, "No tienes un perfil de socio asociado.")
+        return redirect('home')
+    
+    import qrcode
+    from io import BytesIO
+    import base64
+    
+    # Generar código QR con el email del socio (el simulador usará esto)
+    qr_data = socio.user.email
+    
+    # Crear el código QR
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_L,
+        box_size=10,
+        border=4,
+    )
+    qr.add_data(qr_data)
+    qr.make(fit=True)
+    
+    # Generar imagen
+    img = qr.make_image(fill_color="black", back_color="white")
+    
+    # Convertir a base64 para mostrar en HTML
+    buffer = BytesIO()
+    img.save(buffer, format='PNG')
+    img_str = base64.b64encode(buffer.getvalue()).decode()
+    
+    context = {
+        'socio': socio,
+        'qr_image': img_str,
+        'qr_data': qr_data,
+    }
+    
+    return render(request, 'socios/panel/mi_qr.html', context)

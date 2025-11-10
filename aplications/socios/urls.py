@@ -19,6 +19,7 @@ urlpatterns = [
     path("panel/cuota/", views.mi_cuota, name="mi_cuota"),
     path("panel/rutina/", views.mi_rutina, name="mi_rutina"),
     path("panel/ocupacion/", views.ocupacion_gimnasio, name="ocupacion_gimnasio"),
+    path("panel/mi-qr/", views.mi_qr, name="mi_qr"),
 
 ]
 

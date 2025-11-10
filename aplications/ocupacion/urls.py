@@ -7,6 +7,7 @@ urlpatterns = [
     path("registrar/", views.registrar_acceso, name="ocupacion_registrar"),
     path("actual/", views.ocupacion_actual, name="ocupacion_actual"),
     path("simulador/", views.simulador, name="simulador"),
+    path("simulador-qr/", views.simulador_qr, name="simulador_qr"),
 
     # APIs para el simulador
     path("api/access/", views.access_event, name="access_event"),
