@@ -6,22 +6,31 @@
 {% endblock %}
 
 {% block extra_css %}
-  {# Tus estilos existentes #}
-  <link rel="stylesheet" href="{% static 'css/nav_home.css' %}?v={{ request.GET.timestamp|default:'1' }}">
-  <link rel="stylesheet" href="{% static 'css/sidebar_admin.css' %}?v=20251104">
   <style>
-    /* Compensar navbar fijo */
+    /* Layout con sidebar */
     body {
-      padding-top: 64px !important;
+      padding-top: 64px;
     }
     
-    /* Botón hamburguesa del sidebar en posición del navbar */
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1040;
+    }
+    
+    .sidebar-overlay.show {
+      display: block;
+    }
+    
+    /* Botón móvil sidebar */
     .mobile-sidebar-btn {
       display: none;
       position: fixed;
       top: 12px;
       right: 15px;
-      z-index: 99999999;
+      z-index: 1050;
       width: 45px;
       height: 45px;
       background: transparent;
@@ -31,31 +40,36 @@
       justify-content: center;
       align-items: center;
       gap: 6px;
-      padding: 8px;
-      transition: all 0.3s ease;
     }
     
     .mobile-sidebar-btn span {
       display: block;
       width: 28px;
       height: 3px;
-      background: #06b6d4;
+      background: var(--migym-cyan);
       border-radius: 2px;
-      transition: all 0.3s ease;
+      transition: all 0.3s;
     }
     
     .mobile-sidebar-btn:hover span {
-      background: #fff;
-    }
-    
-    /* Ocultar el botón del navbar en dashboard */
-    .menu-toggle {
-      display: none !important;
+      background: white;
     }
     
     @media (max-width: 768px) {
       .mobile-sidebar-btn {
-        display: flex !important;
+        display: flex;
+      }
+      
+      .sidebar {
+        position: fixed;
+        left: -280px;
+        width: 280px;
+        z-index: 1045;
+        transition: left 0.3s;
+      }
+      
+      .sidebar.show {
+        left: 0;
       }
     }
   </style>

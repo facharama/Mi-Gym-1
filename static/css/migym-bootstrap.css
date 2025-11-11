@@ -1,0 +1,379 @@
+/* ============================================
+   MiGym - Bootstrap 5 Custom Theme
+   Minimalista | Dark | Cyan/Orange
+   ============================================ */
+
+:root {
+  /* Colores de marca */
+  --migym-cyan: #06b6d4;
+  --migym-orange: #ff9800;
+  --migym-dark: #0a0e1a;
+  --migym-panel: #111827;
+  --migym-border: #1f2937;
+  --migym-text: #e5e7eb;
+  --migym-text-muted: #9ca3af;
+  
+  /* Bootstrap overrides */
+  --bs-body-bg: var(--migym-dark);
+  --bs-body-color: var(--migym-text);
+  --bs-border-color: var(--migym-border);
+  --bs-border-radius: 0.75rem;
+  --bs-border-radius-sm: 0.5rem;
+  --bs-border-radius-lg: 1rem;
+  
+  /* Primary = Cyan */
+  --bs-primary: var(--migym-cyan);
+  --bs-primary-rgb: 6, 182, 212;
+  
+  /* Secondary = Orange */
+  --bs-secondary: var(--migym-orange);
+  --bs-secondary-rgb: 255, 152, 0;
+  
+  /* Links */
+  --bs-link-color: var(--migym-cyan);
+  --bs-link-hover-color: #0891b2;
+}
+
+/* ============================================
+   BODY & LAYOUT
+   ============================================ */
+body {
+  background: var(--migym-dark);
+  color: var(--migym-text);
+  font-family: 'Segoe UI', system-ui, -apple-system, Roboto, Arial, sans-serif;
+  min-height: 100vh;
+}
+
+/* ============================================
+   CARDS & PANELS
+   ============================================ */
+.card {
+  background: var(--migym-panel);
+  border: 1px solid var(--migym-border);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.card-header {
+  background: rgba(6, 182, 212, 0.1);
+  border-bottom: 1px solid var(--migym-border);
+  color: var(--migym-text);
+  font-weight: 600;
+}
+
+.card-body {
+  color: var(--migym-text);
+}
+
+/* ============================================
+   BUTTONS
+   ============================================ */
+.btn-primary {
+  background: linear-gradient(135deg, var(--migym-cyan), #0891b2);
+  border: none;
+  color: white;
+  font-weight: 600;
+  transition: all 0.3s;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(6, 182, 212, 0.4);
+  background: linear-gradient(135deg, #0891b2, var(--migym-cyan));
+}
+
+.btn-secondary {
+  background: linear-gradient(135deg, var(--migym-orange), #f57c00);
+  border: none;
+  color: white;
+  font-weight: 600;
+}
+
+.btn-secondary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(255, 152, 0, 0.4);
+}
+
+.btn-outline-primary {
+  border: 2px solid var(--migym-cyan);
+  color: var(--migym-cyan);
+}
+
+.btn-outline-primary:hover {
+  background: var(--migym-cyan);
+  color: white;
+}
+
+/* ============================================
+   FORMS
+   ============================================ */
+.form-control,
+.form-select {
+  background: var(--migym-dark);
+  border: 1px solid var(--migym-border);
+  color: var(--migym-text);
+}
+
+.form-control:focus,
+.form-select:focus {
+  background: var(--migym-dark);
+  border-color: var(--migym-cyan);
+  color: var(--migym-text);
+  box-shadow: 0 0 0 0.25rem rgba(6, 182, 212, 0.25);
+}
+
+.form-label {
+  color: var(--migym-text);
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.form-control::placeholder {
+  color: var(--migym-text-muted);
+}
+
+/* ============================================
+   TABLES
+   ============================================ */
+.table {
+  color: var(--migym-text);
+}
+
+.table-dark {
+  --bs-table-bg: var(--migym-panel);
+  --bs-table-striped-bg: rgba(6, 182, 212, 0.05);
+  --bs-table-hover-bg: rgba(6, 182, 212, 0.1);
+  border-color: var(--migym-border);
+}
+
+.table thead {
+  background: rgba(6, 182, 212, 0.1);
+  border-bottom: 2px solid var(--migym-cyan);
+}
+
+/* ============================================
+   BADGES
+   ============================================ */
+.badge {
+  font-weight: 600;
+  padding: 0.5rem 0.75rem;
+}
+
+.badge.bg-success {
+  background: linear-gradient(135deg, #10b981, #059669) !important;
+}
+
+.badge.bg-danger {
+  background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+}
+
+.badge.bg-warning {
+  background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+}
+
+.badge.bg-info {
+  background: linear-gradient(135deg, var(--migym-cyan), #0891b2) !important;
+}
+
+/* ============================================
+   ALERTS
+   ============================================ */
+.alert {
+  border: none;
+  border-left: 4px solid;
+}
+
+.alert-success {
+  background: rgba(16, 185, 129, 0.1);
+  border-left-color: #10b981;
+  color: #10b981;
+}
+
+.alert-danger {
+  background: rgba(239, 68, 68, 0.1);
+  border-left-color: #ef4444;
+  color: #ef4444;
+}
+
+.alert-warning {
+  background: rgba(245, 158, 11, 0.1);
+  border-left-color: #f59e0b;
+  color: #f59e0b;
+}
+
+.alert-info {
+  background: rgba(6, 182, 212, 0.1);
+  border-left-color: var(--migym-cyan);
+  color: var(--migym-cyan);
+}
+
+/* ============================================
+   NAVBAR
+   ============================================ */
+.navbar-dark {
+  background: var(--migym-dark) !important;
+  border-bottom: 2px solid var(--migym-cyan);
+}
+
+.navbar-dark .navbar-brand,
+.navbar-dark .nav-link {
+  color: var(--migym-text) !important;
+}
+
+.navbar-dark .nav-link:hover,
+.navbar-dark .nav-link.active {
+  color: var(--migym-cyan) !important;
+}
+
+/* ============================================
+   SIDEBAR (Admin & Socio)
+   ============================================ */
+.sidebar {
+  background: var(--migym-panel);
+  border-right: 1px solid var(--migym-border);
+  min-height: 100vh;
+  padding: 1.5rem 1rem;
+}
+
+.sidebar .nav-link {
+  color: var(--migym-text-muted);
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  margin-bottom: 0.5rem;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.sidebar .nav-link:hover {
+  background: rgba(6, 182, 212, 0.1);
+  color: var(--migym-cyan);
+}
+
+.sidebar .nav-link.active {
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.2), rgba(6, 182, 212, 0.1));
+  color: var(--migym-cyan);
+  border-left: 3px solid var(--migym-cyan);
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.brand-circle {
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, var(--migym-cyan), #0891b2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.25rem;
+  box-shadow: 0 8px 20px rgba(6, 182, 212, 0.4);
+}
+
+/* ============================================
+   MODAL
+   ============================================ */
+.modal-content {
+  background: var(--migym-panel);
+  border: 1px solid var(--migym-border);
+}
+
+.modal-header {
+  border-bottom: 1px solid var(--migym-border);
+}
+
+.modal-footer {
+  border-top: 1px solid var(--migym-border);
+}
+
+/* ============================================
+   PAGINATION
+   ============================================ */
+.pagination .page-link {
+  background: var(--migym-panel);
+  border-color: var(--migym-border);
+  color: var(--migym-text);
+}
+
+.pagination .page-link:hover {
+  background: rgba(6, 182, 212, 0.1);
+  border-color: var(--migym-cyan);
+  color: var(--migym-cyan);
+}
+
+.pagination .page-item.active .page-link {
+  background: var(--migym-cyan);
+  border-color: var(--migym-cyan);
+}
+
+/* ============================================
+   UTILITIES
+   ============================================ */
+.text-muted {
+  color: var(--migym-text-muted) !important;
+}
+
+.bg-dark {
+  background: var(--migym-dark) !important;
+}
+
+.bg-panel {
+  background: var(--migym-panel) !important;
+}
+
+.border-cyan {
+  border-color: var(--migym-cyan) !important;
+}
+
+.text-cyan {
+  color: var(--migym-cyan) !important;
+}
+
+.text-orange {
+  color: var(--migym-orange) !important;
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in-up {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+/* ============================================
+   SCROLLBAR (webkit browsers)
+   ============================================ */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--migym-dark);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--migym-border);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--migym-cyan);
+}
