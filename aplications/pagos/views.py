@@ -24,8 +24,30 @@ def crear_pago(request):
 @login_required
 def listar_pagos(request):
     from .models import Pago
+    from aplications.socios.models import Plan
     pagos = Pago.objects.select_related("suscripcion", "suscripcion__socio", "suscripcion__plan").order_by("-fecha_pago")
-    return render(request, "pagos/lista.html", {"pagos": pagos})
+
+    # Filtros avanzados
+    socio = request.GET.get("socio", "").strip()
+    metodo = request.GET.get("metodo", "")
+    plan_id = request.GET.get("plan", "")
+    fecha = request.GET.get("fecha", "")
+
+    if socio:
+        pagos = pagos.filter(
+            models.Q(suscripcion__socio__user__username__icontains=socio) |
+            models.Q(suscripcion__socio__nombre__icontains=socio) |
+            models.Q(suscripcion__socio__apellido__icontains=socio)
+        )
+    if metodo:
+        pagos = pagos.filter(metodo=metodo)
+    if plan_id:
+        pagos = pagos.filter(suscripcion__plan__id=plan_id)
+    if fecha:
+        pagos = pagos.filter(fecha_pago__date=fecha)
+
+    planes = Plan.objects.filter(activo=True).order_by("nombre")
+    return render(request, "pagos/lista.html", {"pagos": pagos, "planes": planes})
 
 @login_required
 def detalle_pago(request, pk):

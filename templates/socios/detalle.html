@@ -34,17 +34,10 @@ window.__django_messages = [
     <!-- Botones de acción principales -->
     <div class="d-flex gap-2 flex-wrap justify-content-end">
       <!-- Registrar pago -->
-      {% if has_active %}
-        <button type="button" class="btn-migym-primary" disabled title="El socio ya tiene una suscripción vigente">
-          <i class="bi bi-cash-coin"></i>
-          REGISTRAR PAGO
-        </button>
-      {% else %}
-        <button type="button" class="btn-migym-primary" data-bs-toggle="modal" data-bs-target="#modalRegistrarPago">
-          <i class="bi bi-cash-coin"></i>
-          REGISTRAR PAGO
-        </button>
-      {% endif %}
+      <button type="button" class="btn-migym-primary" data-bs-toggle="modal" data-bs-target="#modalRegistrarPago">
+        <i class="bi bi-cash-coin"></i>
+        REGISTRAR PAGO
+      </button>
 
       <!-- Editar -->
       <a href="{% url 'socios:editar' socio.pk %}" class="btn-migym-editar">
@@ -56,13 +49,13 @@ window.__django_messages = [
       <form method="post"
             action="{% url 'socios:eliminar' socio.pk %}"
             class="d-inline"
-            data-confirm="¿Eliminar al socio {{ socio.user.get_full_name|default:socio.user.username }}? Esta acción no se puede deshacer."
-            data-confirm-ok="Eliminar"
+            data-confirm="¿Desactivar al socio {{ socio.user.get_full_name|default:socio.user.username }}? Esta acción se puede revertir."
+            data-confirm-ok="Desactivar"
             data-confirm-cancel="Cancelar">
         {% csrf_token %}
         <button type="submit" class="btn-migym-eliminar">
-          <i class="bi bi-trash"></i>
-          Eliminar
+          <i class="bi bi-x-circle"></i>
+          Desactivar
         </button>
       </form>
 
@@ -245,17 +238,29 @@ window.__django_messages = [
   {{ block.super }}
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-  {# Limpiar backdrops y estados residuales al cargar #}
   <script>
   document.addEventListener('DOMContentLoaded', function () {
-    // Limpiar cualquier backdrop residual
-    setTimeout(function(){
+    // Limpiar cualquier backdrop residual y desbloquear pantalla si el modal queda bloqueado
+    function limpiarModal() {
       var backdrops = document.querySelectorAll('.modal-backdrop');
       backdrops.forEach(function(bd){ bd.remove(); });
       document.body.classList.remove('modal-open');
       document.body.style.overflow = '';
       document.body.style.paddingRight = '';
-    }, 100);
+    }
+    setInterval(limpiarModal, 1000); // Revisa cada segundo por si queda bloqueado
+
+    // Permitir cerrar el modal con Escape
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        limpiarModal();
+        var modal = document.getElementById('modalRegistrarPago');
+        if (modal) {
+          var bsModal = bootstrap.Modal.getInstance(modal);
+          if (bsModal) bsModal.hide();
+        }
+      }
+    });
   });
   </script>
 

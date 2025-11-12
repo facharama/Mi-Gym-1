@@ -160,7 +160,7 @@
         </thead>
         <tbody>
           {% for s in socios %}
-          <tr {% if not s.activo %}class="table-secondary"{% endif %}>
+          <tr>
             <td>{{ s.user.username }}</td>
             <td>{{ s.user.last_name }}</td>
             <td>{{ s.user.first_name }}</td>

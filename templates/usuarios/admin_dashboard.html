@@ -11,46 +11,54 @@
   <div class="row g-3 mb-3">
     {# Socios Activos #}
     <div class="col-12 col-md-6 col-lg-3">
-      <div class="card h-100">
-        <div class="card-body text-center">
-          <i class="bi bi-person-check" style="font-size: 2.5rem; color: #10b981;"></i>
-          <h3 class="mt-3 mb-0" style="color: #10b981;">{{ socios_activos }}</h3>
-          <p class="text-muted mb-0">Socios Activos</p>
+  <a href="{% url 'socios:lista' %}?activo=1" style="text-decoration: none;">
+        <div class="card h-100 card-hover">
+          <div class="card-body text-center">
+            <i class="bi bi-person-check" style="font-size: 2.5rem; color: #10b981;"></i>
+            <h3 class="mt-3 mb-0" style="color: #10b981;">{{ socios_activos }}</h3>
+            <p class="text-muted mb-0">Socios Activos</p>
+          </div>
         </div>
-      </div>
+      </a>
     </div>
     
     {# Socios Inactivos #}
     <div class="col-12 col-md-6 col-lg-3">
-      <div class="card h-100">
-        <div class="card-body text-center">
-          <i class="bi bi-person-x" style="font-size: 2.5rem; color: #6b7280;"></i>
-          <h3 class="mt-3 mb-0" style="color: #6b7280;">{{ socios_inactivos }}</h3>
-          <p class="text-muted mb-0">Socios Inactivos</p>
+  <a href="{% url 'socios:lista' %}?activo=0" style="text-decoration: none;">
+        <div class="card h-100 card-hover">
+          <div class="card-body text-center">
+            <i class="bi bi-person-x" style="font-size: 2.5rem; color: #6b7280;"></i>
+            <h3 class="mt-3 mb-0" style="color: #6b7280;">{{ socios_inactivos }}</h3>
+            <p class="text-muted mb-0">Socios Inactivos</p>
+          </div>
         </div>
-      </div>
+      </a>
     </div>
     
     {# Suscripciones Vencidas #}
     <div class="col-12 col-md-6 col-lg-3">
-      <div class="card h-100">
-        <div class="card-body text-center">
-          <i class="bi bi-exclamation-triangle" style="font-size: 2.5rem; color: #ef4444;"></i>
-          <h3 class="mt-3 mb-0" style="color: #ef4444;">{{ suscripciones_vencidas }}</h3>
-          <p class="text-muted mb-0">Suscripciones Vencidas</p>
+  <a href="{% url 'socios:suscripciones_pendientes' %}?estado=Vencida" style="text-decoration: none;">
+        <div class="card h-100 card-hover">
+          <div class="card-body text-center">
+            <i class="bi bi-exclamation-triangle" style="font-size: 2.5rem; color: #ef4444;"></i>
+            <h3 class="mt-3 mb-0" style="color: #ef4444;">{{ suscripciones_vencidas }}</h3>
+            <p class="text-muted mb-0">Suscripciones Vencidas</p>
+          </div>
         </div>
-      </div>
+      </a>
     </div>
     
     {# Ocupación Global #}
     <div class="col-12 col-md-6 col-lg-3">
-      <div class="card h-100">
-        <div class="card-body text-center">
-          <i class="bi bi-people" style="font-size: 2.5rem; color: #06b6d4;"></i>
-          <h3 class="mt-3 mb-0" style="color: #06b6d4;">{{ ocupacion_global }} / {{ capacidad_global }}</h3>
-          <p class="text-muted mb-0">Ocupación Global</p>
+  <a href="{% url 'ocupacion:ocupacion_actual' %}" style="text-decoration: none;">
+        <div class="card h-100 card-hover">
+          <div class="card-body text-center">
+            <i class="bi bi-people" style="font-size: 2.5rem; color: #06b6d4;"></i>
+            <h3 class="mt-3 mb-0" style="color: #06b6d4;">{{ ocupacion_global }} / {{ capacidad_global }}</h3>
+            <p class="text-muted mb-0">Ocupación Global</p>
+          </div>
         </div>
-      </div>
+      </a>
     </div>
   </div>
   

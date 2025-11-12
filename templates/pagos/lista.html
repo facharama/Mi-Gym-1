@@ -26,10 +26,38 @@
   <div class="card shadow-sm">
     <div class="card-header d-flex align-items-center justify-content-between">
       <h2 class="h5 mb-0">Pagos registrados</h2>
-      {# espacio para futuros filtros/busqueda si querés #}
-       <form class="d-none d-md-flex" role="search">
-           <input class="form-control form-control-sm" type="search" placeholder="Buscar..." aria-label="Buscar">
-         </form> 
+      <form method="get" class="row g-2 align-items-center m-0" style="min-width: 600px;">
+        <div class="col-auto">
+          <input name="socio" type="text" class="form-control form-control-sm" placeholder="Socio (email o nombre)" value="{{ request.GET.socio|default:'' }}" style="width: 160px;">
+        </div>
+        <div class="col-auto">
+          <select name="metodo" class="form-select form-select-sm" style="width: 120px;">
+            <option value="">Método</option>
+            <option value="Efectivo" {% if request.GET.metodo == 'Efectivo' %}selected{% endif %}>Efectivo</option>
+            <option value="Debito" {% if request.GET.metodo == 'Debito' %}selected{% endif %}>Débito</option>
+            <option value="Credito" {% if request.GET.metodo == 'Credito' %}selected{% endif %}>Crédito</option>
+            <option value="Transferencia" {% if request.GET.metodo == 'Transferencia' %}selected{% endif %}>Transferencia</option>
+            <option value="MP" {% if request.GET.metodo == 'MP' %}selected{% endif %}>Mercado Pago</option>
+          </select>
+        </div>
+        <div class="col-auto">
+          <select name="plan" class="form-select form-select-sm" style="width: 140px;">
+            <option value="">Plan</option>
+            {% for plan in planes %}
+              <option value="{{ plan.id }}" {% if request.GET.plan == plan.id|stringformat:'s' %}selected{% endif %}>{{ plan.nombre }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-auto">
+          <input name="fecha" type="date" class="form-control form-control-sm" value="{{ request.GET.fecha|default:'' }}" style="width: 140px;">
+        </div>
+        <div class="col-auto">
+          <button type="submit" class="btn-migym-primary"><i class="bi bi-search"></i> Buscar</button>
+          {% if request.GET.socio or request.GET.metodo or request.GET.plan or request.GET.fecha %}
+            <a href="?" class="btn-migym-secondary"><i class="bi bi-x-circle"></i> Limpiar</a>
+          {% endif %}
+        </div>
+      </form>
     </div>
 
     <div class="card-body p-0">
