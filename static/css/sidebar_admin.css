@@ -133,19 +133,23 @@ body:not(.sidebar-collapsed) .left-sidebar {
 }
 
 /* ====== Empuje de contenido ====== */
+
 .dash-container,
-.dash-container.container-fluid { 
-  margin-left: 200px !important;
+ .dash-container,
+ .dash-container.container-fluid { 
+   margin-left: 200px !important;
   padding-left: 2rem !important;
   padding-right: 2rem !important;
-  transition: margin-left .25s ease !important;
-  min-height: calc(100vh - 64px) !important;
-  box-sizing: border-box !important;
-  position: relative !important;
-  z-index: 1 !important;
-  width: auto !important;
-  max-width: none !important;
-}
+  padding-top: 0 !important;
+  background: #000 !important;
+   transition: margin-left .25s ease !important;
+   min-height: calc(100vh - 64px) !important;
+   box-sizing: border-box !important;
+   position: relative !important;
+   z-index: 1 !important;
+   width: auto !important;
+   max-width: none !important;
+ }
 
 body.sidebar-collapsed .dash-container,
 body.sidebar-collapsed .dash-container.container-fluid { 
@@ -215,6 +219,8 @@ body.sidebar-collapsed .dash-container.container-fluid {
     padding-right: 1rem !important; 
     margin-left: 0 !important;
     width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: visible !important;
   }
 }
 

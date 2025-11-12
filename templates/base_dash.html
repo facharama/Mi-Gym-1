@@ -87,7 +87,7 @@
 
 
   {# Sumamos utilidades Bootstrap sin tocar tu layout #}
-  <div class="dash-container container-fluid py-4">
+  <div class="dash-container container-fluid" style="background:#000; min-height:100vh; padding-top:0;">
     {% block page_content %}{% endblock %}
   </div>
   {% include "partials/_messages_modal.html" %}
@@ -116,12 +116,8 @@
     // Función para saber si es móvil
     const isMobile = () => window.innerWidth <= 768;
     
-    // Estado inicial: colapsado en móvil, expandido en desktop
-    if (isMobile()) {
-      body.classList.add('sidebar-collapsed');
-    } else {
-      body.classList.remove('sidebar-collapsed');
-    }
+    // Estado inicial: SIEMPRE colapsado al cargar
+    body.classList.add('sidebar-collapsed');
     
     // Toggle del sidebar
     function toggleSidebar(e) {
