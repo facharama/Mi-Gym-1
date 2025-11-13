@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Registrar Acceso</h2>
+
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit">Guardar</button>
+  <a href="{% url 'ocupacion:ocupacion_actual' %}">Cancelar</a>
+</form>
+{% endblock %}

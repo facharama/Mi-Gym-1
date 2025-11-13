@@ -1,0 +1,143 @@
+{% extends "base_dash.html" %}
+{% load static %}
+
+{% block extra_css %}
+  {{ block.super }}
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="{% static 'css/migym-theme.css' %}">
+  <style>
+    .qr-container {
+      animation: fadeInUp 0.6s ease-out;
+    }
+    
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .qr-card {
+      background: var(--brand-panel);
+      border: 1px solid var(--brand-border);
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      overflow: hidden;
+    }
+    
+    .qr-image-wrapper {
+      background: white;
+      padding: 2rem;
+      border-radius: 15px;
+      display: inline-block;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+    
+    .btn-download {
+      background: linear-gradient(135deg, var(--cyan, #06b6d4), #0891b2);
+      border: none;
+      color: white;
+      padding: 0.75rem 2rem;
+      border-radius: 10px;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+    
+    .btn-download:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(6, 182, 212, 0.4);
+      color: white;
+    }
+    
+    .info-badge {
+      background: rgba(6, 182, 212, 0.1);
+      border: 1px solid var(--brand-border);
+      border-left: 4px solid var(--cyan, #06b6d4);
+      padding: 1rem 1.5rem;
+      border-radius: 12px;
+      color: var(--text-secondary, #9ca3af);
+    }
+  </style>
+{% endblock %}
+
+{% block page_title %}
+  <h4 class="fw-bold mb-0">
+    <i class="bi bi-qr-code me-2"></i>
+    Mi Código QR
+  </h4>
+{% endblock %}
+
+{% block page_content %}
+<div class="container-fluid py-4 qr-container">
+  
+  <div class="row justify-content-center">
+    <div class="col-lg-8 col-xl-6">
+      
+      <!-- Card Principal -->
+      <div class="card qr-card">
+        <div class="card-body text-center p-5">
+          
+          <!-- Título -->
+          <h5 class="mb-4" style="color: var(--text-primary, #e5e7eb); font-weight: 600;">
+            Tu código de acceso personal
+          </h5>
+          
+          <!-- Código QR -->
+          <div class="mb-4">
+            <div class="qr-image-wrapper">
+              <img src="data:image/png;base64,{{ qr_image }}" 
+                   alt="Código QR de {{ socio.user.get_full_name }}"
+                   style="max-width: 300px; width: 100%; height: auto;">
+            </div>
+          </div>
+          
+          <!-- Info del socio -->
+          <div class="mb-4">
+            <h6 style="color: var(--text-primary, #e5e7eb); font-weight: 600;">
+              {{ socio.user.get_full_name }}
+            </h6>
+            <p class="mb-0" style="color: var(--text-secondary, #9ca3af); font-size: 0.9rem;">
+              {{ socio.user.email }}
+            </p>
+            <p class="mb-0 mt-2" style="color: var(--text-secondary, #9ca3af); font-size: 0.875rem;">
+              <i class="bi bi-building me-2"></i>{{ socio.sucursal.nombre }}
+            </p>
+          </div>
+          
+          <!-- Botón de descarga -->
+          <div class="mb-4">
+            <a href="data:image/png;base64,{{ qr_image }}" 
+               download="mi-qr-{{ socio.user.email }}.png"
+               class="btn btn-download">
+              <i class="bi bi-download me-2"></i>
+              Descargar QR
+            </a>
+          </div>
+          
+          <!-- Instrucciones -->
+          <div class="info-badge text-start">
+            <h6 class="mb-2" style="color: var(--text-primary, #e5e7eb); font-weight: 600; font-size: 0.9rem;">
+              <i class="bi bi-info-circle me-2"></i>
+              Cómo usar tu código QR
+            </h6>
+            <ul class="mb-0 ps-3" style="font-size: 0.875rem; line-height: 1.8;">
+              <li>Muestra este código al ingresar al gimnasio</li>
+              <li>El personal escaneará tu QR para registrar tu acceso</li>
+              <li>También puedes descargarlo y guardarlo en tu teléfono</li>
+              <li>Este código es personal e intransferible</li>
+            </ul>
+          </div>
+          
+        </div>
+      </div>
+      
+    </div>
+  </div>
+  
+</div>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% load roles %}
+{% load static %}
+
+<nav>
+  {% if user.is_authenticated %}
+    <a href="{% url 'home' %}">Inicio</a>
+    {% if user|has_group:"Socio" %}
+      <a href="{% url 'panel_socio' %}">Mi Panel</a>
+    {% endif %}
+    {% if user|has_group:"Recepcion" or user|has_group:"AdminLocal" or user|has_group:"Instructor" %}
+      <a href="{% url 'dashboard_admin' %}">Panel Administrativo</a>
+    {% endif %}
+    <a href="{% url 'logout' %}">Salir</a>
+  {% else %}
+    <a href="{% url 'login' %}">Ingresar</a>
+  {% endif %}
+</nav>

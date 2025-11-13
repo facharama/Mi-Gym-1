@@ -1,0 +1,80 @@
+:root {
+  --bg: #08090a;
+  --panel: #000000;
+  --muted: #9aa4ad;
+  --orange: #ff6a00;
+  --cyan: #06b6d4;
+  --radius: 20px;
+  --shadow: 0 20px 40px rgba(0,0,0,0.6);
+  font-family: 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+}
+
+body.bg-dark {
+  margin: 0;
+  background: var(--bg);
+  color: #fff;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.content-wrap {
+  flex: 1;
+  padding: 2rem;
+}
+
+/* Navbar base */
+nav.nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--panel);
+  padding: 1rem 2rem;
+  box-shadow: var(--shadow);
+  border-bottom: 2px solid var(--orange);
+}
+
+nav.nav .logo,
+nav.nav .brand {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: var(--cyan);
+  text-decoration: none;
+}
+
+nav.nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: 1.5rem;
+}
+
+nav.nav ul li a,
+nav.nav ul li span {
+  color: #fff;
+  text-decoration: none;
+  transition: color .2s ease;
+}
+
+nav.nav ul li a:hover {
+  color: var(--orange);
+}
+
+/* Admin navbar extra */
+nav.nav-admin {
+  border-bottom: 2px solid var(--cyan);
+}
+
+.card-neon{
+  display:block; padding:1rem 1.2rem; border-radius:14px;
+  background:#0b0f1a; color:#e5e7eb; text-decoration:none;
+  border:1px solid rgba(6,182,212,.25);
+  transition: transform .12s ease, box-shadow .2s ease, border-color .2s ease;
+}
+.card-neon:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(0,0,0,.45);
+  border-color: var(--cyan);
+  color:#fff;
+}

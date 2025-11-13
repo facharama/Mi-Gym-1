@@ -1,0 +1,147 @@
+ body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    /* Barra de navegación */
+    nav {
+      background-color: #ef7d0ae5;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 40px;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .logo {
+      font-size: 24px;
+      font-weight: bold;
+      color: #fff;
+      text-decoration: none;  
+      color: #ffcc00; 
+               
+    }
+    .logo span { color: #ffd600; }
+
+    .nav-links {
+      list-style: none;
+      display: flex;
+      gap: 25px;
+      margin: 0;
+      padding: 0;
+    }
+    .nav-links li a {
+      text-decoration: none;
+      color: white;
+      font-weight: 500;
+      transition: color 0.3s;
+    }
+    .nav-links li a:hover {
+      color: #ffd600;
+    }
+
+    /* 🔹 Menú hamburguesa */
+    .menu-toggle {
+      display: none;
+      flex-direction: column;
+      cursor: pointer;
+      gap: 5px;
+    }
+    .menu-toggle div {
+      width: 25px;
+      height: 3px;
+      background: white;
+      border-radius: 2px;
+      transition: all 0.3s;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .nav-links {
+        position: absolute;
+        top: 60px;
+        right: 0;
+        background: #ef7d0ae5;
+        flex-direction: column;
+        width: 200px;
+        height: 0;
+        overflow: hidden;
+        transition: height 0.3s ease;
+      }
+      .nav-links.open {
+        height: auto;
+        padding: 20px 0;
+      }
+      .menu-toggle {
+        display: flex;
+      }
+    }
+
+    /* Slider */
+    .swiper {
+      width: 100%;
+      height: 70vh;
+    }
+    .swiper-slide {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-size: cover;
+      background-position: center;
+      color: white;
+      font-size: 32px;
+      font-weight: bold;
+    }
+    .swiper-slide img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* Secciones */
+    .section {
+      text-align: center;
+      padding: 60px 20px;
+      color: white;
+    }
+    .section.orange { background: #f15a24; }
+    .section.blue { background: #84bbee; }
+
+    .section h2 { margin-bottom: 15px; font-size: 32px; }
+    .section p { margin-bottom: 20px; font-size: 18px; }
+
+    .btn {
+      background: purple;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 25px;
+      text-decoration: none;
+      font-weight: bold;
+      transition: background 0.3s;
+    }
+    .btn:hover { background: #6a1b9a; }
+
+    /* Footer */
+    footer {
+      background: #fff;
+      padding: 40px;
+      text-align: center;
+      color: #666;
+    }
+    footer .social {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+    footer .social a {
+      text-decoration: none;
+      font-size: 24px;
+      color: #999;
+    }
+    footer p { margin: 5px 0; font-size: 14px; }
+
+    /* Scroll suave */
+    html { scroll-behavior: smooth; }

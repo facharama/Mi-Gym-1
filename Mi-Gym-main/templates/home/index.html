@@ -1,0 +1,72 @@
+{% load static %}
+{% extends "base_home.html" %}
+
+{% block title %}MiGym{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/login.css' %}">
+  <link rel="stylesheet" href="{% static 'css/home.css' %}">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.css">
+  <link rel="icon" type="image/png" href="{% static 'img/logo.png' %}">
+{% endblock %}
+
+{% block content %}
+  <!-- Slider -->
+  <div class="swiper mySwiper">
+    <div class="swiper-wrapper">
+      <div class="swiper-slide">
+        <img src="{% static 'img/MyGym1.jpg' %}" alt="Plan Red">
+      </div>
+      <div class="swiper-slide">
+        <img src="{% static 'img/imagenHOME.jpeg' %}" alt="Plan Blue">
+      </div>
+      <div class="swiper-slide">
+        <img src="{% static 'img/MyGym.jpg' %}" alt="Plan Gold">
+      </div>
+    </div>
+    <div class="swiper-pagination"></div>
+    <div class="swiper-button-prev"></div>
+    <div class="swiper-button-next"></div>
+  </div>
+
+  <!-- Secciones -->
+  <section class="section orange" id="servicios">
+    <h2>PASE DE PRUEBA</h2>
+    <p>Vení a entrenar por un día gratis registrándote</p>
+    <a href="#" class="btn">¡SOLICITAR GRATIS!</a>
+  </section>
+
+  <section class="section blue" id="clases">
+    <h2>50% EN EL MES DE SEPTIEMBRE</h2>
+    <p>Solo para socios de RIVER</p>
+    <a href="#" class="btn">MÁS INFO</a>
+  </section>
+
+  <!-- Footer -->
+  <footer id="contacto">
+    <div class="social">
+      <a href="#"><i class="fa-brands fa-instagram"></i></a>
+      <a href="#"><i class="fa-brands fa-facebook"></i></a>
+      <a href="#"><i class="fa-solid fa-phone"></i></a>
+      <a href="#"><i class="fa-solid fa-envelope"></i></a>
+      <a href="#"><i class="fa-brands fa-linkedin"></i></a>
+    </div>
+    <p><strong>AYUDA</strong></p>
+    <p>Pautas de Convivencia | Trabajá con Nosotros | Botón de Arrepentimiento | Términos y Condiciones</p>
+    <p>© MyGym 2025 - Todos los derechos reservados</p>
+    <p>Dirección: Av.Falsa 1234, Capital Federal, Argentina</p>
+  </footer>
+{% endblock %}
+
+{% block extra_js %}
+  <script src="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.js"></script>
+  <script src="https://kit.fontawesome.com/yourcode.js" crossorigin="anonymous"></script>
+  <script>
+    var swiper = new Swiper(".mySwiper", {
+      loop: true,
+      autoplay: { delay: 4000 },
+      pagination: { el: ".swiper-pagination", clickable: true },
+      navigation: { nextEl: ".swiper-button-next", prevEl: ".swiper-button-prev" },
+    });
+  </script>
+{% endblock %}

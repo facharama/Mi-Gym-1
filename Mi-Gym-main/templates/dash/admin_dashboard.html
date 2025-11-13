@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <title>Dashboard Administrador</title>
+
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/admin.css' %}">
+    
+    <link rel="icon" type="image/png" href="{% static 'img/logo.png' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="main-container">
+        <nav class="nav-desktop">
+            <a href="/socios/">Socios</a>
+            <a href="/pagos/">Pagos</a>
+            <a href="/rutina/asignar/">Rutinas</a>
+            <a href="/ocupacion/actual/">Ocupación</a>
+            {% if user.is_authenticated %}
+                <form method="post" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button type="submit">Salir</button>
+                </form>
+            {% endif %}
+        </nav>
+
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>Panel de Administrador</h2>
+                <div class="hamburger-menu close-sidebar" id="sidebar-close-btn">
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="/socios/">Socios</a>
+                <a href="/pagos/">Pagos</a>
+                <a href="/rutina/asignar/">Rutinas</a>
+                <a href="/ocupacion/actual/">Ocupación</a>
+                {% if user.is_authenticated %}
+                    <form method="post" action="{% url 'logout' %}">
+                        {% csrf_token %}
+                        <button type="submit">
+                            <span class="icon">🚪</span> Salir
+                        </button>
+                    </form>
+                {% endif %}
+            </nav>
+        </aside>
+
+        <div class="content-container">
+            <header>
+                <div class="hamburger-menu" id="main-hamburger">
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                </div>
+            </header>
+
+            <main>
+                <h2>Estadísticas rápidas</h2>
+                <div class="stats">
+                    <div class="stat-card">
+                        <h3>Total de socios</h3>
+                        <p>{{ total_socios }}</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Cuotas pendientes</h3>
+                        <p>{{ cuotas_pendientes }}</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Ocupación actual</h3>
+                        <p>{{ ocupacion_actual }}</p>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    
+    <script src="{% static 'js/admin.js' %}"></script>
+</body>
+</html>

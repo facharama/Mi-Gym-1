@@ -1,0 +1,142 @@
+{% comment %} Modal MiGym para Django messages (sin load de tags) {% endcomment %}
+{% if messages %}
+<div class="migm-modal-backdrop" id="migmMsgBackdrop"></div>
+<div class="migm-modal" role="dialog" aria-modal="true" id="migmMsgModal">
+  <div class="migm-modal-card">
+    <div class="migm-modal-header">Notificación</div>
+    <div class="migm-modal-body">
+      <ul class="m-0 list-unstyled">
+        {% for m in messages %}
+          {% with tag=m.tags|default:"info" %}
+            {% if "error" in tag %}{% with tag="danger" %}{% endwith %}{% endif %}
+            <li class="migm-{{ tag }}">{{ m }}</li>
+          {% endwith %}
+        {% endfor %}
+      </ul>
+    </div>
+    <div class="migm-modal-actions">
+      <button class="btn btn-primary" id="migmMsgOk">Aceptar</button>
+    </div>
+  </div>
+</div>
+
+<style>
+
+  /* Fondo oscuro translúcido */
+  .migm-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(3px);
+    z-index: 1060;
+    animation: fadeIn 0.25s ease-in;
+  }
+
+  /* Contenedor del modal */
+  .migm-modal {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1070;
+    animation: fadeIn 0.3s ease-in;
+  }
+
+  /* Tarjeta */
+  .migm-modal-card {
+    width: min(480px, 90vw);
+    background: linear-gradient(180deg, #141414 0%, #1b1b1b 100%);
+    color: #fff;
+    border: 1px solid #ff7a00;
+    border-radius: 14px;
+    padding: 20px 24px;
+    box-shadow: 0 0 30px rgba(255, 122, 0, 0.25);
+    animation: popIn 0.35s ease-out;
+  }
+
+  /* Encabezado */
+  .migm-modal-header {
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: #ff7a00;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .migm-modal-header::before {
+    font-size: 1.2em;
+  }
+
+  /* Texto del cuerpo */
+  .migm-modal-body {
+    margin-top: 12px;
+  }
+  .migm-modal-body li {
+    margin: 4px 0;
+    list-style: none;
+    padding-left: 1.2em;
+    position: relative;
+  }
+
+  .migm-modal-body li::before {
+    content: "•";
+    color: #ff7a00;
+    position: absolute;
+    left: 0;
+  }
+
+  /* Botón */
+  .migm-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 18px;
+  }
+
+  #migmMsgOk {
+    background: #ff7a00;
+    color: #fff;
+    font-weight: 600;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 6px;
+    transition: background 0.2s ease;
+  }
+
+  #migmMsgOk:hover {
+    background: #ff9933;
+  }
+
+  /* Animaciones */
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes popIn {
+    from { transform: scale(0.92); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  /* Colores por tipo de mensaje */
+  .migm-danger { color: #ffb3b3; }
+  .migm-warning { color: #ffd78a; }
+  .migm-info { color: #9ad0ff; }
+  .migm-success { color: #63e6be; }
+</style>
+
+
+
+<script>
+(function(){
+  const ok = document.getElementById("migmMsgOk");
+  const modal = document.getElementById("migmMsgModal");
+  const back  = document.getElementById("migmMsgBackdrop");
+  function close(){ try{ modal.remove(); back.remove(); }catch(e){} }
+  ok?.addEventListener("click", close);
+  back?.addEventListener("click", close);
+  document.addEventListener("keydown", (e)=>{ if(e.key==="Escape") close(); });
+})();
+</script>
+{% endif %}

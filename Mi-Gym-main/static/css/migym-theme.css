@@ -1,0 +1,143 @@
+:root{
+  --brand-orange: #ff9800;
+  --brand-blue:   #06b6d4;
+  --brand-black:  #000000;
+  --brand-panel:  #0f0f10;  /* paneles/cards */
+  --brand-border: #1a1a1a;
+  --brand-text:   #ffffff;
+}
+
+/* Variables de Bootstrap para el tema */
+:root, [data-bs-theme="migym"]{
+  --bs-body-bg: var(--brand-black);
+  --bs-body-color: var(--brand-text);
+
+  --bs-primary:   var(--brand-orange);
+  --bs-secondary: var(--brand-blue);
+  --bs-dark:      var(--brand-black);
+
+  --bs-border-color: var(--brand-border);
+  --bs-link-color: var(--brand-blue);
+  --bs-link-hover-color: color-mix(in oklab, var(--brand-blue), rgb(255, 255, 255) 20%);
+
+  --bs-btn-border-radius: .6rem;
+  --bs-border-radius:      .75rem;
+  --bs-border-radius-sm:   .5rem;
+  --bs-border-radius-lg:   1rem;
+
+  /* Subtles */
+  --bs-primary-bg-subtle:     color-mix(in oklab, var(--brand-orange), black 85%);
+  --bs-primary-border-subtle: color-mix(in oklab, var(--brand-orange), black 65%);
+  --bs-secondary-bg-subtle:   color-mix(in oklab, var(--brand-blue),   black 85%);
+  --bs-secondary-border-subtle: color-mix(in oklab, var(--brand-blue), black 65%);
+}
+
+/* Layout base (contenedores grandes) */
+.container, .container-fluid{ max-width: 1240px; }
+
+/* ---------- NAVBAR ---------- */
+.navbar-migym{
+  background: var(--brand-black) !important;
+  border-bottom: 2px solid var(--brand-orange);
+}
+.navbar-migym .navbar-brand,
+.navbar-migym .nav-link,
+.navbar-migym .navbar-toggler{ color:#fff !important; }
+.navbar-migym .nav-link:hover,
+.navbar-migym .nav-link.active{ color: var(--brand-orange) !important; }
+.navbar-migym .navbar-toggler{ border-color: rgba(255,255,255,.25); }
+.navbar-migym .navbar-toggler:focus{ box-shadow: 0 0 0 .2rem rgba(241,90,36,.35); }
+
+/* ---------- BOTONES ---------- */
+.btn-primary{
+  background-color: var(--brand-orange);
+  border-color: var(--brand-orange);
+  text-transform: uppercase;
+  letter-spacing: .02em;
+  box-shadow: 0 6px 18px rgba(241,90,36,.22);
+}
+.btn-primary:hover{
+  background-color: #d84f1f;
+  border-color: #d84f1f;
+}
+.btn-secondary{
+  background-color: var(--brand-blue);
+  border-color: var(--brand-blue);
+  color:rgb(0, 0, 0);
+}
+.btn-outline-primary{
+  border-color: var(--brand-orange);
+  color: var(--brand-orange);
+}
+.btn-outline-primary:hover{
+  background-color: var(--brand-orange);
+  color:#000;
+}
+
+/* ---------- CARDS / PANELS ---------- */
+.card{
+  background-color: var(--brand-panel);
+  border: 1px solid var(--brand-border);
+  box-shadow: 0 8px 30px rgb(0, 0, 0);
+}
+.card .card-header{
+  background: linear-gradient(180deg, rgba(241,90,36,.12), transparent);
+  border-bottom: 1px solid rgba(241,90,36,.45);
+}
+
+/* ---------- TABS ---------- */
+.nav-tabs{ border-bottom:1px solid var(--brand-border); }
+.nav-tabs .nav-link{
+  color: var(--brand-blue);
+  background: transparent;
+  border:0;
+  border-bottom:3px solid transparent;
+}
+.nav-tabs .nav-link:hover{ border-bottom-color: rgba(6,182,212,.25);; }
+.nav-tabs .nav-link.active{
+  color:#fff;
+  border-bottom-color: var(--brand-orange);
+}
+
+/* ---------- FORMULARIOS ---------- */
+.form-label{ font-weight: 600; }
+.form-control, .form-select, .form-check-input{
+  background-color:#111214;
+  color: var(--brand-text);
+  border-color: var(--brand-border);
+  border-radius:.6rem;
+}
+.form-control::placeholder{ color:#9aa3ad; }
+.form-control:focus, .form-select:focus{
+  background-color:#131416;
+  color:#fff;
+  border-color: var(--brand-orange);
+  box-shadow: 0 0 0 .2rem rgba(241,90,36,.25);
+}
+
+/* ---------- TABLAS ---------- */
+.table{
+  color: var(--brand-text);
+  border-color: var(--brand-border);
+}
+.table thead th{
+  color:#fff;
+  border-bottom: 2px solid rgba(241,90,36,.6);
+}
+.table-striped>tbody>tr:nth-of-type(odd)>*{
+  background-color: rgba(6,182,212,.25);
+}
+.table-hover>tbody>tr:hover>*{
+  background-color: rgba(241,90,36,.08);
+}
+
+/* ---------- PROGRESS (p/ ocupación) ---------- */
+.progress{ background-color:#141516; border:1px solid var(--brand-border); border-radius:1rem; }
+.progress-bar{ background-color: var(--brand-orange); }
+
+/* ---------- UTILIDADES DE MARCA ---------- */
+.text-brand { color: var(--brand-orange) !important; }
+.text-brand-2 { color: var(--brand-blue) !important; }
+.bg-brand { background: var(--brand-orange) !important; }
+.bg-brand-2 { background: var(--brand-blue) !important; }
+.border-brand { border-color: var(--brand-orange) !important; }

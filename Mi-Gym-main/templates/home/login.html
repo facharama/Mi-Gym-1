@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% load static %}
+{% block navbar %}
+  {% include "partials/nav_home.html" %}
+{% endblock %}
+{% block content %}
+<div class="neon-wrap">
+  <div class="neon-stage">
+    <div class="neon-box">
+      <div class="neon-inner">
+        <h3 class="neon-title">LOGIN</h3>
+
+        <form method="post" id="loginForm" class="neon-form" novalidate>
+          {% csrf_token %}
+
+          <div class="field">
+            <label for="{{ form.username.id_for_label }}">Usuario:</label>
+            {{ form.username }}
+          </div>
+
+          <div class="field password-field">
+            <label for="{{ form.password.id_for_label }}">Contraseña:</label>
+            {{ form.password }}
+            <button type="button" class="toggle-password" aria-label="Mostrar contraseña">👁️</button>
+          </div>
+
+          <button type="submit" id="submitBtn" class="neon-cta">Entrar</button>
+
+          <a href="{% url 'password_reset' %}" class="forgot-link">¿Olvidaste tu contraseña?</a>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<link rel="stylesheet" href="{% static 'css/neon-gym-login.css' %}">
+<script src="{% static 'js/neon-gym-login.js' %}"></script>
+
+{% endblock %}

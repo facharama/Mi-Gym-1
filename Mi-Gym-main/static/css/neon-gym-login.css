@@ -1,0 +1,287 @@
+/* Neon gym login - black, orange, cyan */
+:root{
+  --bg:#08090a;
+  --panel:#000000;            
+  --inner:#0b0b0b;
+  --muted:#9aa4ad;
+  --orange:#ff6a00;
+  --cyan:rgb(7, 182, 213);
+  --glass: rgba(255,255,255,0.02);
+  --radius:20px;
+  --shadow-strong: 0 30px 60px rgba(2,6,23,0.7);
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+}
+
+*{box-sizing:border-box}
+
+/* Fondo con overlay + imagen */
+body{
+  margin:0;
+  color:#fff;
+  background:
+    linear-gradient(rgba(0,0,0,.55), rgba(0,0,0,.55)),
+    url('../img/fondo_login.png'); /* ← poné aquí tu imagen en B&N */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed; /* quítalo si en mobile ves tirones */
+}
+
+/* Center stage */
+.neon-wrap{
+  min-height:calc(100vh - 64px);
+  display:flex;align-items:center;justify-content:center;
+  padding:4rem 3rem; /* + espacio para que entre el glow */
+}
+.neon-stage{
+  width:min(900px,96%);
+  display:flex;align-items:center;justify-content:center;
+  overflow:visible; /* evita corte del brillo */
+} /* evita scroll */
+
+/* Outer floating box */
+.neon-box{
+  position:relative;
+  width:420px;
+  height:auto;
+  border-radius:calc(var(--radius) + 6px);
+  background:var(--panel);
+  box-shadow:var(--shadow-strong), inset 0 2px 8px rgba(255,255,255,0.02);
+  padding:22px;
+  transform:translateZ(0);
+  overflow:visible;
+  margin:12px;              /* respiración del glow */
+  isolation:isolate;        /* que las pseudo no se recorten */
+}
+
+/* Marco fijo con varias líneas alrededor del recuadro */
+.neon-box::before,
+.neon-box::after{
+  content:"";
+  position:absolute;
+  inset:0; /* al borde exacto */
+  border-radius:calc(var(--radius) + 6px);
+  pointer-events:none;
+  z-index:1;
+  animation:none; /* sin rotaciones ni pulso */
+  opacity:1;
+}
+
+/* Capa cyan (varias líneas con spread) */
+.neon-box::before{
+  border: 2px solid rgba(6,182,212,0.75);
+  box-shadow:
+    0 0 0 3px rgba(6,182,212,0.35),   /* 2da línea cyan pegada */
+    0 0 14px rgba(6,182,212,0.55),
+    0 0 28px rgba(6,182,212,0.40);
+}
+
+/* Capa naranja más afuera (doble marco) */
+.neon-box::after{
+  inset:-8px; /* un poco más afuera */
+  border: 2px solid rgba(255,106,0,0.65);
+  border-radius:calc(var(--radius) + 14px);
+  box-shadow:
+    0 0 0 4px rgba(255,106,0,0.30),   /* 2da línea naranja */
+    0 0 16px rgba(255,106,0,0.50),
+    0 0 34px rgba(255,106,0,0.35);
+}
+
+/* Inner card */
+.neon-inner{
+  position:relative;
+  z-index:3;
+  background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));
+  border-radius:14px;
+  padding:28px;
+  display:flex;
+  
+  flex-direction:column;
+  align-items:stretch;
+}
+
+/* Recessed panel */
+.neon-inner::before{
+  content:"";
+  position:absolute;
+  inset:22px;
+  border-radius:10px;
+  background:rgba(255,255,255,0.01);
+  box-shadow:inset 0 4px 20px rgba(0,0,0,0.7);
+  z-index:1;
+}
+
+/* Title */
+.neon-title{
+  z-index:4;
+  margin:0 0 18px;
+  letter-spacing:6px;
+  font-weight:700;
+  text-align:center;
+  color:#fff;
+  display:block;
+  position:relative;
+  font-size:18px;
+}
+
+/* Form */
+.neon-form{position:relative;z-index:5;display:flex;flex-direction:column;gap:12px}
+.field{display:flex;flex-direction:column;z-index:5;position:relative}
+.field label{font-size:.8rem;color:var(--muted);margin-bottom:6px}
+.field input[type="text"],
+.field input[type="password"],
+.field input[type="email"]{
+  width:100%;
+  padding:12px 14px;
+  border-radius:999px;
+  border:1px solid rgb(255, 255, 255);
+  background:rgba(255,255,255,0.02);
+  color:#fff;outline:none;font-size:.95rem;
+  transition:box-shadow .16s, border-color .16s, transform .08s;
+  backdrop-filter:blur(4px);
+}
+
+/* espacio para el botón ojo */
+.password-field input[type="password"],
+.password-field input[type="text"]{ padding-right:50px; }
+
+/* focus */
+.field input:focus{
+  box-shadow:0 6px 28px rgba(6,182,212,0.06), inset 0 0 0 1px rgba(6,182,212,0.12);
+  border-color:rgba(6,182,212,0.22);
+  transform:translateY(-1px);
+}
+
+/* Toggle button (ojo) - sin padding-top para que no baje */
+.toggle-password{
+  position:absolute;
+  right:14px;
+  padding-top: 20px;
+  top:50%;
+  transform:translateY(-50%);
+  background:transparent;
+  border:none;
+  color:#d1d5db;
+  cursor:pointer;
+  font-size:20px;
+  line-height:1;
+  z-index:7;
+}
+.toggle-password:hover{color:#fff}
+
+/* Row + links */
+.row-between{display:flex;justify-content:space-between;align-items:center;font-size:.9rem;color:var(--muted);margin-top:6px}
+.small-link{color:var(--muted);text-decoration:none}
+
+/* CTA */
+.neon-cta{
+  margin-top:8px;
+  padding:12px 14px;
+  border-radius:999px;border:none;font-weight:800;
+  background:linear-gradient(90deg, var(--cyan) 0%, var(--orange) 100%);
+  box-shadow:
+    0 8px 30px rgba(6,182,212,0.08),
+    0 18px 50px rgba(255,106,0,0.06),
+    0 0 36px rgba(6,182,212,0.12);
+  color:#07121a;
+  cursor:pointer;
+  transition:transform .12s ease, box-shadow .12s ease;
+  font-size:1rem;
+}
+.neon-cta:hover{
+  transform:translateY(-3px);
+  box-shadow:
+    0 18px 60px rgba(6,182,212,0.12),
+    0 28px 70px rgba(255,106,0,0.08);
+}
+
+/* Responsive */
+@media (max-width:520px){
+  .neon-wrap{ padding:5rem 1.5rem; }
+  .neon-box{width:92%}
+  .neon-inner{padding:18px}
+  .neon-inner::before{inset:16px}
+}
+
+/* En mobile, evitar parpadeo del fondo fijo */
+@media (max-width:768px){
+  body{ background-attachment: scroll; }
+}
+
+/* Animations (desactivadas) */
+@keyframes rotate-1{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes rotate-2{from{transform:rotate(360deg)}to{transform:rotate(0deg)}}
+@media (prefers-reduced-motion:reduce){
+  .neon-box::before,.neon-box::after{animation:none;transform:none;filter:none}
+}
+
+/* === Accentos "GYM" sin cambiar el HTML === */
+
+/* Icono kettlebell antes del título */
+.neon-title{
+  position: relative;
+  padding-top: 8px;
+}
+.neon-title::before{
+  content:"";
+  position:absolute;
+  top:-2px; left:50%;
+  transform:translateX(-50%);
+  width:28px; height:28px;
+  opacity:.9;
+  background-size: 100% 100%;
+  filter: drop-shadow(0 2px 6px rgba(6,182,212,.25)) drop-shadow(0 4px 10px rgba(255,106,0,.15));
+}
+
+/* Separador tipo EKG debajo del título */
+.neon-title::after{
+  content:"";
+  position:absolute;
+  left:50%; transform:translateX(-50%);
+  bottom:-10px;
+  width:160px; height:2px;
+  background:
+    linear-gradient(90deg, transparent, rgba(6,182,212,.6), rgba(255,106,0,.7), transparent);
+  mask:
+    linear-gradient(90deg, transparent 10%, #000 40%, #000 60%, transparent 90%);
+  animation: ekg-move 2.2s linear infinite;
+  border-radius:2px;
+  box-shadow: 0 0 10px rgba(6,182,212,.35), 0 0 14px rgba(255,106,0,.25);
+}
+@keyframes ekg-move {
+  0%   { background-position: -160px 0; }
+  100% { background-position: 160px 0; }
+}
+
+/* Watermark (mancuernas) hiper sutil en la tarjeta interna */
+.neon-inner::after{
+  content:"";
+  position:absolute;
+  inset:24px;
+  border-radius:10px;
+  pointer-events:none;
+  opacity:.06;
+  background-repeat: no-repeat;
+  background-position: right 20px bottom 18px;
+  background-size: 220px auto;
+}
+
+/* Ojo: hover celeste, activo naranja (cuando el input es type="text") */
+.toggle-password{ transition: color .15s ease; }
+.toggle-password:hover{ color:#06b6d4; }
+.password-field input[type="text"] ~ .toggle-password{ color:#ff6a00; }
+
+/* Forgot password link */
+.forgot-link{
+  margin-top:14px;
+  text-align:center;
+  display:block;
+  font-size:.9rem;
+  color:var(--muted);
+  text-decoration:none;
+  transition:color .2s ease, text-shadow .2s ease;
+}
+.forgot-link:hover{
+  color:var(--cyan);
+  text-shadow:0 0 8px rgba(6,182,212,0.6), 0 0 12px rgba(255,106,0,0.4);
+}

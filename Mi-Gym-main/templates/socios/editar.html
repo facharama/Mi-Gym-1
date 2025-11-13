@@ -1,0 +1,99 @@
+{% extends "base_dash.html" %}
+{% load static %}
+
+{% block extra_css %}
+  {{ block.super }}
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="{% static 'css/migym-theme.css' %}">
+{% endblock %}
+
+{% block page_content %}
+<div class="container-fluid py-3">
+
+  <section class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <h1 class="h3 mb-1">Editar socio</h1>
+      <p class="text-body-secondary m-0">Modificá los datos y guardá los cambios.</p>
+    </div>
+    <div>
+      <a href="{% url 'socios:detalle' socio.pk %}" class="btn btn-link">Volver al detalle</a>
+    </div>
+  </section>
+
+  <section class="card shadow-sm">
+    <div class="card-header">
+      <h2 class="h5 mb-0">Datos del socio</h2>
+    </div>
+
+    <div class="card-body">
+      <form method="post" action="" class="row g-3" data-unsaved-warning="true">
+        {% csrf_token %}
+        
+        <div class="col-md-6">
+          <label class="form-label">Nombre</label>
+          {{ form.first_name }}
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Apellido</label>
+          {{ form.last_name }}
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">DNI</label>
+          {{ form.dni }}
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Sucursal</label>
+          {{ form.sucursal }}
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Estado</label>
+          {{ form.estado }}
+        </div>
+        <div class="col-md-6"></div>
+
+        <div class="col-md-12">
+          <label class="form-label">Email</label>
+          {{ form.email }}
+        </div>
+
+        <div class="col-12 d-flex justify-content-end gap-2 mt-2">
+          <a href="{% url 'socios:detalle' socio.pk %}"
+             class="btn btn-outline-secondary"
+             data-confirm="Tenés cambios sin guardar. ¿Descartar y volver?"
+             data-confirm-ok="Descartar"
+             data-confirm-cancel="Seguir editando">Cancelar</a>
+
+          <button type="submit" class="btn btn-primary">GUARDAR</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+  {{ block.super }}
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+  (function(){
+    const forms = document.querySelectorAll('form[data-unsaved-warning="true"]');
+    forms.forEach(form => {
+      let dirty = false;
+      form.addEventListener('change', () => dirty = true, {capture:true});
+      form.addEventListener('input',  () => dirty = true, {capture:true});
+      form.addEventListener('submit', () => { dirty = false; });
+      window.addEventListener('beforeunload', function(e){
+        if (!dirty) return;
+        e.preventDefault();
+        e.returnValue = '';
+      });
+    });
+  })();
+  </script>
+{% endblock %}

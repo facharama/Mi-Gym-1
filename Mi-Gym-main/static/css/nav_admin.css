@@ -1,0 +1,69 @@
+/* --- Navbar Admin --- */
+nav.nav-admin {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+
+  background: var(--brand-black); /* usa tu color de tema */
+  border-bottom: 2px solid var(--brand-orange); /* naranja en lugar de cyan */
+  box-shadow: 0 2px 6px rgba(0,0,0,0.6);
+}
+
+nav.nav-admin .brand {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--brand-text); /* texto blanco */
+  text-decoration: none;
+}
+
+nav.nav-admin .brand span {
+  color: var(--brand-orange); /* naranja */
+}
+
+/* Links */
+nav.nav-admin ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: 1.2rem;
+}
+
+nav.nav-admin ul li a,
+nav.nav-admin ul li button {
+  color: var(--brand-text); /* texto blanco */
+  text-decoration: none;
+  font-weight: 500;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  transition: background 0.25s ease, color 0.25s ease;
+}
+
+/* Hover */
+nav.nav-admin ul li a:hover,
+nav.nav-admin ul li button:hover {
+  background: rgba(255,152,0,0.15); /* naranja con transparencia */
+  color: var(--brand-orange); /* naranja */
+  cursor: pointer;
+}
+
+/* Activo */
+nav.nav-admin ul li a.active {
+  background: var(--brand-orange); /* naranja */
+  color: var(--brand-black); /* negro */
+  font-weight: 600;
+}
+
+nav.nav-admin .brand .brand-text {
+  display: none;
+}
+.left-sidebar:hover ~ .dash-container nav.nav-admin .brand .brand-text {
+  display: inline;
+}

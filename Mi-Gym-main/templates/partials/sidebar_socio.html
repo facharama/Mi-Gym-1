@@ -1,0 +1,46 @@
+{% with request.resolver_match.url_name as current %}
+<aside class="left-sidebar" aria-label="Panel de navegación socio">
+  <div class="ls-brand">
+    <div class="brand-circle">
+      MG
+    </div>
+  </div>
+
+  <nav class="ls-nav">
+    <a href="{% url 'socios:panel_socio' %}" class="ls-item {% if current == 'panel_socio' %}active{% endif %}">
+      <i class="bi bi-grid-3x3-gap-fill ico"></i>
+      <span>Mi Panel</span>
+    </a>
+
+    <a href="{% url 'socios:mi_cuota' %}" class="ls-item {% if current == 'mi_cuota' %}active{% endif %}">
+      <i class="bi bi-credit-card-fill ico"></i>
+      <span>Mi Cuota</span>
+    </a>
+
+    <a href="{% url 'socios:mi_rutina' %}" class="ls-item {% if current == 'mi_rutina' %}active{% endif %}">
+      <i class="bi bi-clipboard-check-fill ico"></i>
+      <span>Mi Rutina</span>
+    </a>
+
+    <a href="{% url 'socios:ocupacion_gimnasio' %}" class="ls-item {% if current == 'ocupacion_gimnasio' %}active{% endif %}">
+      <i class="bi bi-bar-chart-fill ico"></i>
+      <span>Ocupación</span>
+    </a>
+
+    <a href="{% url 'socios:mi_qr' %}" class="ls-item {% if current == 'mi_qr' %}active{% endif %}">
+      <i class="bi bi-qr-code ico"></i>
+      <span>Mi QR</span>
+    </a>
+
+    <hr class="my-3" style="border-color: rgba(255,255,255,0.1);">
+
+    <form method="post" action="{% url 'logout' %}">
+      {% csrf_token %}
+      <button type="submit" class="ls-item danger border-0 w-100 text-start" style="background: transparent;">
+        <i class="bi bi-box-arrow-right ico"></i>
+        <span>Salir</span>
+      </button>
+    </form>
+  </nav>
+</aside>
+{% endwith %}

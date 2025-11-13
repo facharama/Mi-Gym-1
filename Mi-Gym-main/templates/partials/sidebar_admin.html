@@ -1,0 +1,60 @@
+{% with request.resolver_match.url_name as current %}
+<aside class="left-sidebar" aria-label="Panel de navegación admin">
+  <div class="ls-brand">
+    <div class="brand-circle">
+      MG
+    </div>
+  </div>
+
+  <nav class="ls-nav">
+    <a href="{% url 'admin_dashboard' %}" class="ls-item {% if current == 'admin_dashboard' %}active{% endif %}">
+      <i class="bi bi-grid-3x3-gap-fill ico"></i>
+      <span>Dashboard</span>
+    </a>
+
+    <a href="{% url 'socios:lista' %}" class="ls-item">
+      <i class="bi bi-people-fill ico"></i>
+      <span>Socios</span>
+    </a>
+
+    <a href="{% url 'pagos:listar' %}" class="ls-item">
+      <i class="bi bi-credit-card-fill ico"></i>
+      <span>Pagos</span>
+    </a>
+
+    <a href="{% url 'rutina:rutina_asignar' %}" class="ls-item">
+      <i class="bi bi-clipboard-check-fill ico"></i>
+      <span>Rutinas</span>
+    </a>
+
+    <a href="{% url 'ocupacion:ocupacion_actual' %}" class="ls-item">
+      <i class="bi bi-bar-chart-fill ico"></i>
+      <span>Ocupación</span>
+    </a>
+
+    <div class="ls-group">
+      <button class="ls-item ls-group-toggle" type="button">
+        <i class="bi bi-gear-fill ico"></i>
+        <span>Configuración</span>
+        <i class="bi bi-chevron-down caret ms-auto"></i>
+      </button>
+      <div class="ls-sub">
+        <a href="{% url 'configuracion:planes_lista' %}" class="ls-subitem">Planes</a>
+        <a href="{% url 'configuracion:sucursales_lista' %}" class="ls-subitem">Sucursales</a>
+        <a href="{% url 'configuracion:ejercicios_lista' %}" class="ls-subitem">Ejercicios</a>
+        <a href="{% url 'configuracion:rutinas_lista' %}" class="ls-subitem">Rutinas</a>
+      </div>
+    </div>
+
+    <hr class="my-3" style="border-color: rgba(255,255,255,0.1);">
+
+    <form method="post" action="{% url 'logout' %}">
+      {% csrf_token %}
+      <button type="submit" class="ls-item danger border-0 w-100 text-start" style="background: transparent;">
+        <i class="bi bi-box-arrow-right ico"></i>
+        <span>Salir</span>
+      </button>
+    </form>
+  </nav>
+</aside>
+{% endwith %}

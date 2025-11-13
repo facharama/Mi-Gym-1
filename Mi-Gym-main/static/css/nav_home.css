@@ -1,0 +1,118 @@
+/* --- Navbar Home con estilo neon --- */
+nav.nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2.5rem;
+  box-sizing: border-box; 
+
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(10px);
+  border-bottom: 2px solid var(--orange);
+}
+
+nav.nav .logo {
+  font-size: 1.6rem;
+  font-weight: bold;
+  color: var(--cyan);
+  text-decoration: none;
+}
+
+nav.nav .logo span {
+  color: var(--orange);
+}
+
+/* Links */
+nav.nav .nav-links {
+  display: flex;
+  list-style: none;
+  gap: 1.5rem;
+  padding-right: .25rem;
+}
+
+nav.nav .nav-links li:last-child a {
+  padding-right: .25rem; 
+}
+
+nav.nav .nav-links li a,
+nav.nav .nav-links li span,
+nav.nav .nav-links li button {
+  color: #fff;
+  font-weight: 500;
+  text-decoration: none;
+  transition: color .3s, text-shadow .3s;
+}
+
+nav.nav .nav-links li a:hover,
+nav.nav .nav-links li button:hover {
+  color: var(--cyan);
+  text-shadow: 0 0 8px var(--cyan);
+  cursor: pointer;
+}
+
+/* --- Menú hamburguesa --- */
+.menu-toggle {
+  display: none;
+  flex-direction: column;
+  cursor: pointer;
+  gap: 5px;
+}
+
+.menu-toggle div {
+  width: 28px;
+  height: 3px;
+  background: var(--cyan);
+  border-radius: 3px;
+  transition: 0.3s;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  nav.nav .nav-links {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    flex-direction: column;
+    background: rgba(0,0,0,0.95);
+    border-left: 2px solid var(--orange);
+    border-bottom: 2px solid var(--orange);
+    width: 220px;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height .4s ease-in-out;
+  }
+
+  nav.nav .nav-links.open {
+    max-height: 500px; /* suficiente para mostrar todo */
+  }
+
+  .menu-toggle {
+    display: flex;
+  }
+  
+  /* Ocultar botón del navbar en páginas con sidebar (dashboard) */
+  body.has-sidebar .menu-toggle {
+    display: none !important;
+  }
+}
+
+nav.nav .nav-links a.active {
+  color: var(--cyan);
+  text-shadow: 0 0 8px var(--cyan);
+  border-bottom: 2px solid var(--orange);
+  padding-bottom: .25rem;
+}
+
+:root{
+  --nav-height: 64px;
+}
+
+nav.nav{
+  min-height: var(--nav-height);
+}

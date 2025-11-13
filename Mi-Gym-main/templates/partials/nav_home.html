@@ -1,0 +1,40 @@
+{% with request.resolver_match.url_name as current %}
+<nav class="nav">
+  <a href="{% url 'home' %}" class="logo">Mi<span style="color:var(--orange)">Gym</span></a>
+
+  <div class="menu-toggle" id="menu-toggle">
+    <div></div><div></div><div></div>
+  </div>
+
+  <ul class="nav-links" id="nav-links">
+    <li>
+      {% if user.is_authenticated %}
+        <span>Hola, {{ user.username }} |</span>
+        <form method="post" action="{% url 'logout' %}" style="display:inline;">
+          {% csrf_token %}
+          <button type="submit" style="background:none;border:none;color:inherit;cursor:pointer;">
+            Cerrar sesión
+          </button>
+        </form>
+      {% else %}
+        <a href="{% url 'login' %}" class="{% if current == 'login' %}active{% endif %}">Iniciar sesión</a>
+      {% endif %}
+    </li>
+    <li><a href="#acerca" class="{% if current == 'about' %}active{% endif %}">Acerca de</a></li>
+    <li><a href="#servicios" class="{% if current == 'servicios' %}active{% endif %}">Servicios</a></li>
+    <li><a href="#clases" class="{% if current == 'clases' %}active{% endif %}">Clases</a></li>
+    <li><a href="#contacto" class="{% if current == 'contacto' %}active{% endif %}">Contacto</a></li>
+  </ul>
+</nav>
+{% endwith %}
+
+<script>
+  // Toggle menú hamburguesa
+  const menuToggle = document.getElementById("menu-toggle");
+  const navLinks = document.getElementById("nav-links");
+  if(menuToggle && navLinks){
+    menuToggle.addEventListener("click", () => {
+      navLinks.classList.toggle("open");
+    });
+  }
+</script>

@@ -1,0 +1,71 @@
+{% load static %}
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+    <script src="{% static 'js/login.js' %}"></script>
+    <title>MiGym-Registro</title>
+
+    <link rel="website icon" type="png"
+    href="../../static/img/logo.png">
+
+</head>
+<body>
+  <nav>
+    <a href="{% url 'home' %}" class="logo">Mi<span>Gym</span></a>
+
+    <div class="menu-toggle" id="menu-toggle">
+      <div></div>
+      <div></div>
+      <div></div>
+    </div>
+
+    <ul class="nav-links" id="nav-links">
+       <li>{% if user.is_authenticated %}
+        <span>Hola, {{ user.username }} |</span>
+        <form method="post" action="{% url 'logout' %}" style="display:inline;">
+          {% csrf_token %}
+          <button type="submit" style="background:none;border:none;color:inherit;cursor:pointer;">
+            Cerrar sesión
+          </button>
+        </form>
+      {% else %}
+        <a href="{% url 'login' %}">Iniciar sesión</a>
+      {% endif %}
+      
+      </li>
+    
+      
+      <li><a href="#acerca">Acerca de</a></li>
+      <li><a href="#servicios">Servicios</a></li>
+      <li><a href="#clases">Clases</a></li>
+      <li><a href="#contacto">Contacto</a></li>
+      </ul>
+  </nav>  
+
+  <script src="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.js"></script>
+  <!-- FontAwesome para íconos -->
+  <script src="https://kit.fontawesome.com/yourcode.js" crossorigin="anonymous"></script>
+  
+  <script>
+    var swiper = new Swiper(".mySwiper", {
+      loop: true,
+      autoplay: { delay: 4000 },
+      pagination: { el: ".swiper-pagination", clickable: true },
+      navigation: { nextEl: ".swiper-button-next", prevEl: ".swiper-button-prev" },
+    });
+
+    // 🔹 Toggle menú hamburguesa
+    const menuToggle = document.getElementById("menu-toggle");
+    const navLinks = document.getElementById("nav-links");
+
+    menuToggle.addEventListener("click", () => {
+      navLinks.classList.toggle("open");
+    });
+  </script> 
+    
+</body>
+</html>

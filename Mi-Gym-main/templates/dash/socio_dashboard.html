@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Dashboard Socio</title>
+  <link rel="stylesheet" href="https://cdn.simplecss.org/simple.min.css">
+
+  <link rel="website icon" type="png"
+    href="../../static/img/logo.png">
+    
+</head>
+<body>
+  <header>
+    <h1>🏋️ Bienvenido, {{ user.username }}</h1>
+    <nav>
+      <a href="/rutina/hoy/{{ user.id }}/">Mi Rutina de Hoy</a> |
+      <a href="/pagos/">Mis Pagos</a> |
+      <a href="/ocupacion/actual/">Ocupación en vivo</a> |
+      
+
+      {% if user.is_authenticated %}
+        <form method="post" action="{% url 'logout' %}" style="display:inline;">
+          {% csrf_token %}
+          <button type="submit" style="background:none;border:none;color:inherit;cursor:pointer;">
+            Salir
+          </button>
+        </form>
+      {% endif %}
+      
+    </nav>
+  </header>
+
+  <main>
+    <h2>Estado de cuota</h2>
+    <p>Tu cuota está: <strong>{{ estado_cuota }}</strong></p>
+
+    <h2>Rutina de hoy</h2>
+    {% if rutina_hoy %}
+      <ul>
+        {% for ejercicio in rutina_hoy %}
+          <li>{{ ejercicio }}</li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>No tenés rutina asignada para hoy.</p>
+    {% endif %}
+
+    <h2>Ocupación actual</h2>
+    <p>{{ ocupacion_actual }} personas entrenando ahora.</p>
+  </main>
+</body>
+</html>
